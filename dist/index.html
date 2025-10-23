@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Modelo_Paletes_v2</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reels/Pallet Model</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <form id="controls" onsubmit="fillPal(); return false;">
+    <div class="form-row">
+      <label for="palSize">Pallet Size:</label>
+      <select id="palSize" onchange="updateCanvasSize()">
+        <option value="1200x800">1200 × 800 mm</option>
+        <option value="1000x1000">1000 × 1000 mm</option>
+        <option value="1200x1000">1200 × 1000 mm</option>
+        <option value="1200x1200">1200 × 1200 mm</option>
+      </select>
+
+      <label>
+        <input type="checkbox" id="allowExceed"> Exceeds Pallet
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label for="shape">Reel Disposition:</label>
+      <select id="shape" onchange="toggleCylinderInputs()">
+        <option value="circle">Vertical</option>
+        <option value="cylinder">Horizontal</option>
+      </select>
+
+      <div id="circleInputs" class="form-row">
+        <label for="diameter">Reel Diameter (mm):</label>
+        <input type="number" id="diameter" min="1" value="400">
+      </div>
+
+      <div id="cylinderInputs" class="form-row" style="display: none;">
+        <label for="cylWidth">Reel Width (mm):</label>
+        <input type="number" id="cylWidth" min="1" value="600">
+        <label for="cylHeight">Bob Diameter (mm):</label>
+        <input type="number" id="cylHeight" min="1" value="800">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <button onclick="fillPal()">Fill Pallet</button>
+      <button onclick="downloadCanvas()">Download Image</button>
+    </div>
+  </form>
+
+  <p><strong>Reels in Pallet:</strong> <span id="bobCount">0</span></p>
+  <canvas id="palCanvas" width="1200" height="800"></canvas>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>

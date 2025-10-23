@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reels/Pallet Model</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <form id="controls" onsubmit="fillPalActive(); return false;">
+    <div class="form-row">
+      <label for="palSize">Pallet Size:</label>
+      <select id="palSize" onchange="updateCanvasSize()">
+        <option value="1200x800">1200 × 800 mm</option>
+        <option value="1000x1000">1000 × 1000 mm</option>
+        <option value="1200x1000">1200 × 1000 mm</option>
+        <option value="1200x1200">1200 × 1200 mm</option>
+      </select>
+
+      <!-- hidden checkbox kept for compatibility com o JS existente -->
+      <input type="checkbox" id="allowExceed" style="display:none">
+    </div>
+
+    <div class="form-row">
+      <label for="shape">Reel Disposition:</label>
+      <select id="shape" onchange="toggleCylinderInputs()">
+        <option value="circle">Vertical</option>
+        <option value="cylinder">Horizontal</option>
+      </select>
+
+      <div id="circleInputs" class="form-row">
+        <label for="diameter">Diameter (mm):</label>
+        <input type="number" id="diameter" min="1" value="400">
+      </div>
+
+      <div id="cylinderInputs" class="form-row" style="display: none;">
+        <label for="cylWidth">Width (mm):</label>
+        <input type="number" id="cylWidth" min="1" value="600">
+        <label for="cylHeight">Diameter (mm):</label>
+        <input type="number" id="cylHeight" min="1" value="800">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- 1) Fill Pallet -->
+      <button type="button" onclick="fillPalActive()">Fill Pallet</button>
+
+      <!-- 2) Exceeds Pallet toggle (keeps hidden checkbox in sync) -->
+      <button id="exceedToggle" type="button" onclick="toggleExceed()">Exceeds Pallet</button>
+
+      <!-- 3) Linear / Hex toggle -->
+      <button id="linearToggle" type="button" class="active" onclick="toggleLinearDisposition()">
+        Linear Disposition
+      </button>
+
+      <!-- hidden submit so Enter triggers form submit -->
+      <button type="submit" id="hiddenSubmit" style="display:none"></button>
+
+      <!-- 4) Download Image -->
+      <button type="button" onclick="downloadCanvas()">Download Image</button>
+    </div>
+  </form>
+
+  <!-- Reels counter centered above the pallet -->
+  <div style="text-align:center; margin:12px 0;">
+    <p style="margin:0;"><strong>Reels in Pallet:</strong> <span id="bobCount">0</span></p>
+  </div>
+
+  <canvas id="palCanvas" width="1200" height="800"></canvas>
+  <script src="script.js"></script>
+  <script src="script_hex.js"></script>
+  <script>
+    // estado global: true = usar linear (script.js), false = usar hex (script_hex.js)
+    window.linearDisposition = true;
+
+    function toggleLinearDisposition() {
+      window.linearDisposition = !window.linearDisposition;
+      const btn = document.getElementById('linearToggle');
+      if (window.linearDisposition) {
+        btn.classList.add('active');
+        btn.textContent = 'Linear Disposition';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = 'Hexagonal Disposition';
+      }
+      // redesenha imediatamente usando o modo activo (mantém os inputs)
+      fillPalActive();
+    }
+
+    // alterna o estado "Exceeds Pallet" (usa o hidden checkbox para compatibilidade)
+    function toggleExceed() {
+      const hidden = document.getElementById('allowExceed');
+      const btn = document.getElementById('exceedToggle');
+      hidden.checked = !hidden.checked;
+      if (hidden.checked) {
+        btn.classList.add('active');
+        btn.textContent = 'Exceeds Pallet ✓';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = 'Exceeds Pallet';
+      }
+      // redesenha com o novo estado
+      fillPalActive();
+    }
+
+    // wrapper que chama a implementação activa
+    function fillPalActive() {
+      if (window.linearDisposition) {
+        if (typeof fillPal === 'function') return fillPal();
+      } else {
+        if (typeof fillPalHex === 'function') return fillPalHex();
+      }
+      // fallback
+      if (typeof fillPal === 'function') return fillPal();
+    }
+  </script>
+</body>
+
+</html>
