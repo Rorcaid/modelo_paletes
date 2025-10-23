@@ -40,8 +40,6 @@ function fillPalHex() {
       if (c.y < minY) minY = c.y;
       if (c.y > maxY) maxY = c.y;
     });
-    const boxW = maxX - minX;
-    const boxH = maxY - minY;
     const targetCenterX = rect.x + rect.width / 2;
     const targetCenterY = rect.y + rect.height / 2;
     const currentCenterX = (minX + maxX) / 2;
@@ -51,6 +49,59 @@ function fillPalHex() {
     centers.forEach(c => { c.x += dx; c.y += dy; });
     // filtra centros que possam sair do rect por borda numérica
     return centers.filter(c => (c.x - r >= rect.x - 1e-6 && c.x + r <= rect.x + rect.width + 1e-6 && c.y - r >= rect.y - 1e-6 && c.y + r <= rect.y + rect.height + 1e-6));
+  }
+
+  // Gerador retangular centrado na área (garante espaçamento vertical = spacingH, evita sobreposição de elipses altas)
+  function generateRectCentersInRect(rect, spacingW, spacingH) {
+    const cols = Math.floor(rect.width / spacingW);
+    const rows = Math.floor(rect.height / spacingH);
+    if (cols <= 0 || rows <= 0) return [];
+    const offsetX = rect.x + (rect.width - cols * spacingW) / 2;
+    const offsetY = rect.y + (rect.height - rows * spacingH) / 2;
+    const centers = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = offsetX + c * spacingW + spacingW / 2;
+        const y = offsetY + r * spacingH + spacingH / 2;
+        centers.push({ x, y });
+      }
+    }
+    return centers;
+  }
+
+  // Distribui totalN centros em 'rows' linhas, centrando cada linha horizontalmente,
+  // com no máximo colsPerRow centros por linha (colsPerRow normalmente colsUpright).
+  function generateDistributedRowCenters(rect, spacingW, spacingH, rows, colsPerRow, totalN) {
+    if (rows <= 0 || colsPerRow <= 0 || totalN <= 0) return [];
+    const allocation = new Array(rows).fill(0);
+    // distribuir totalN pelas rows: primeiras recebem 1 extra se necessário
+    for (let i = 0; i < totalN; i++) allocation[i % rows]++;
+
+    // garantir que nenhuma linha excede colsPerRow (corte se necessário)
+    let assigned = allocation.reduce((s, v) => s + Math.min(v, colsPerRow), 0);
+    // se cortamos, reduzir linhas adicionais a zero até assigned == totalN (rare)
+    // aqui apenas garante segurança
+    for (let r = 0; r < rows && assigned > totalN; r++) {
+      const cut = Math.min(allocation[r], assigned - totalN);
+      allocation[r] -= cut;
+      assigned -= cut;
+    }
+
+    const centers = [];
+    for (let r = 0; r < rows; r++) {
+      const m = Math.min(allocation[r], colsPerRow);
+      if (m <= 0) continue;
+      // y para a linha r (mantém o espaçamento vertical regular)
+      const y = rect.y + r * spacingH + spacingH / 2;
+      // centro horizontal da linha
+      const lineWidth = m * spacingW;
+      const startX = rect.x + (rect.width - lineWidth) / 2 + spacingW / 2;
+      for (let c = 0; c < m; c++) {
+        const x = startX + c * spacingW;
+        centers.push({ x, y });
+      }
+    }
+    return centers;
   }
 
   if (shape === "circle") {
@@ -106,11 +157,75 @@ function fillPalHex() {
     // decidir alinhamento como na versão linear: se houver rotacionadas top-align upright, senão center
     const offsetY = rowsRotated > 0 ? 0 : offsetYCentered;
 
-    // área para upright (onde desenharemos com hex packing usando d = spacingW horizontal)
+    // área para upright (onde desenharemos)
     const uprightRect = { x: 0, y: offsetY, width: canvas.width, height: rowsUpright * spacingH };
-    // gerar centros hex usando d = spacingW (usa cilindro largura como "diâmetro" de célula)
-    const centersUpright = generateHexCentersInRect(uprightRect, spacingW);
-    // desenha elipses upright (centros hex, elipses rx = cylWidth/2, ry = cylHeight/2)
+
+    // Primeiro tenta gerar centros por hex para obter N desejado (mantém consistência com hex count)
+    const hexCentersUpright = generateHexCentersInRect(uprightRect, spacingW);
+    const desiredN = hexCentersUpright.length;
+
+    // Se a altura da elipse (cylHeight) é maior do que o passo vertical do hex (causa sobreposição),
+    // reorganiza em linhas retangulares distribuindo 'desiredN' entre as linhas (ex.: 4 acima, 3 abaixo).
+    const hexVStepForUpright = Math.sqrt(3) / 2 * spacingW; // 0.866 * spacingW
+    let centersUpright = [];
+    if (cylHeight > hexVStepForUpright + 1e-6 && rowsUpright >= 1) {
+      // distribuir desiredN por rowsUpright linhas, centrando cada linha horizontalmente
+      centersUpright = generateDistributedRowCenters(uprightRect, spacingW, spacingH, rowsUpright, colsUpright, desiredN);
+    } else {
+      centersUpright = hexCentersUpright;
+    }
+
+    // Rotated area: decide similarmente se usar hex ou retangular (verifica overlap potencial)
+    const hexVStepForRot = Math.sqrt(3) / 2 * spacingRotW; // vertical step if hex with d=spacingRotW
+    const offsetYRot = rowsUpright * spacingH + Math.max(0, (remainingHeight - rowsRotated * spacingRotH));
+    const rotRect = { x: 0, y: offsetYRot, width: canvas.width, height: rowsRotated * spacingRotH };
+    let centersRot = [];
+    // primeira tentativa hex to get desired count for rotated
+    const hexCentersRot = generateHexCentersInRect(rotRect, spacingRotW);
+    const desiredNRot = hexCentersRot.length;
+    if (cylWidth > hexVStepForRot + 1e-6 && rowsRotated >= 1) {
+      centersRot = generateDistributedRowCenters(rotRect, spacingRotW, spacingRotH, rowsRotated, colsRotated, desiredNRot);
+    } else {
+      centersRot = hexCentersRot;
+    }
+
+    // --- overlap detection: se hex gerou sobreposições, fallback para layout linear (fillPal)
+    function overlapsAny(listA, rA, listB, rB) {
+      for (let i = 0; i < listA.length; i++) {
+        for (let j = 0; j < listB.length; j++) {
+          const dx = listA[i].x - listB[j].x;
+          const dy = listA[i].y - listB[j].y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < (rA + rB) - 1e-6) return true;
+        }
+      }
+      return false;
+    }
+    const rU = Math.max(cylWidth / 2, cylHeight / 2); // conservativo
+    const rR = Math.max(cylHeight / 2, cylWidth / 2);
+    // verificar intra-lista (upright-upright) e inter-lista (upright-rotated) e rotated-rotated
+    let bad = false;
+    for (let i = 0; i < centersUpright.length && !bad; i++) {
+      for (let j = i + 1; j < centersUpright.length; j++) {
+        if (Math.hypot(centersUpright[i].x - centersUpright[j].x, centersUpright[i].y - centersUpright[j].y) < (rU + rU) - 1e-6) { bad = true; break; }
+      }
+    }
+    if (!bad) bad = overlapsAny(centersUpright, rU, centersRot, rR);
+    if (!bad) {
+      for (let i = 0; i < centersRot.length && !bad; i++) {
+        for (let j = i + 1; j < centersRot.length; j++) {
+          if (Math.hypot(centersRot[i].x - centersRot[j].x, centersRot[i].y - centersRot[j].y) < (rR + rR) - 1e-6) { bad = true; break; }
+        }
+      }
+    }
+    if (bad) {
+      // fallback: desenhar exactamente como a disposição linear original
+      if (typeof fillPal === "function") {
+        return fillPal();
+      }
+    }
+
+    // desenha elipses upright (centros calculados)
     centersUpright.forEach(c => {
       ctx.beginPath();
       ctx.ellipse(c.x, c.y, cylWidth / 2, cylHeight / 2, 0, 0, Math.PI * 2);
@@ -120,11 +235,6 @@ function fillPalHex() {
       count++;
     });
 
-    // área para rotacionadas: colocadas na parte inferior da área restante (bottom-align)
-    const offsetYRot = rowsUpright * spacingH + Math.max(0, (remainingHeight - rowsRotated * spacingRotH));
-    const rotRect = { x: 0, y: offsetYRot, width: canvas.width, height: rowsRotated * spacingRotH };
-    // usar d = spacingRotW (cylHeight) para hex packing das rotacionadas
-    const centersRot = generateHexCentersInRect(rotRect, spacingRotW);
     centersRot.forEach(c => {
       ctx.beginPath();
       ctx.ellipse(c.x, c.y, cylHeight / 2, cylWidth / 2, 0, 0, Math.PI * 2);
