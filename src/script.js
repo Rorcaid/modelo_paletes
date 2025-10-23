@@ -3,9 +3,36 @@ function updateCanvasSize() {
   const canvas = document.getElementById("palCanvas");
   const size = document.getElementById("palSize").value;
   const [width, height] = size.split("x").map(Number);
+  // mantemos width/height lógicos (unidades do modelo) e guardamos para o autosize
   canvas.width = width;
   canvas.height = height;
+  canvas.setAttribute("data-logical-width", width);
+  canvas.setAttribute("data-logical-height", height);
+  // ajusta o CSS display size para caber na viewport sem distorção
+  autosizeCanvas();
 }
+
+// Garante que o canvas CSS size se ajusta à viewport mantendo a proporção lógica
+function autosizeCanvas() {
+  const canvas = document.getElementById("palCanvas");
+  if (!canvas) return;
+  const logicalW = parseFloat(canvas.getAttribute("data-logical-width")) || canvas.width;
+  const logicalH = parseFloat(canvas.getAttribute("data-logical-height")) || canvas.height;
+  // calcular espaço disponível (reservar espaço para controles e contador)
+  const controls = document.getElementById("controls");
+  const controlsHeight = controls ? controls.getBoundingClientRect().height : 120;
+  const margin = 32; // margem total horizontal
+  const extraVert = 120; // espaço reservado acima/below controls (ajuste se necessário)
+  const availW = Math.max(200, window.innerWidth - margin);
+  const availH = Math.max(200, window.innerHeight - controlsHeight - extraVert);
+  const scale = Math.min(availW / logicalW, availH / logicalH);
+  // aplica CSS size proporcional (mantém a mesma razão para evitar ovalização)
+  canvas.style.width = Math.round(logicalW * scale) + "px";
+  canvas.style.height = Math.round(logicalH * scale) + "px";
+}
+
+// chama autosize ao redimensionar a janela
+window.addEventListener("resize", autosizeCanvas);
 
 // Mostra/oculta inputs do formulário conforme o tipo de "shape" selecionado
 function toggleCylinderInputs() {
@@ -172,4 +199,7 @@ function downloadCanvas() {
 }
 
 // inicializa tamanho do canvas ao carregar a página
-window.onload = updateCanvasSize;
+window.onload = function () {
+  updateCanvasSize();
+  // ...existing code... (se houver mais inicializações)
+};
