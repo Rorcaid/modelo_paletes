@@ -92,17 +92,33 @@ form#controls {
   flex-wrap: wrap;
 }
 
-/* Arrange circle and cylinder inputs vertically and aligned */
-#circleInputs,
-#cylinderInputs {
+/* Arrange circle inputs vertically and cylinder inputs as side-by-side columns */
+#circleInputs {
+  display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 }
 
-/* Hide cylinder inputs by default; JS will show the active set */
 #cylinderInputs {
   display: none;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+/* individual column for label+input centered */
+.input-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-col input {
+  width: 120px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 #circleInputs label,
