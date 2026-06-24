@@ -312,35 +312,13 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
   const widthTextWidth = ctx.measureText(widthLabel).width;
   const heightTextWidth = ctx.measureText(heightLabel).width;
 
-  // fundo e etiqueta para o valor da largura (linha horizontal)
-  ctx.fillStyle = 'white';
-  ctx.fillRect(
-    centerX - widthTextWidth / 2 - 8,
-    centerY + 8,
-    widthTextWidth + 16,
-    heightLine + 8,
-  );
   ctx.fillStyle = '#666';
-  ctx.fillText(
-    widthLabel,
-    centerX - widthTextWidth / 2,
-    centerY + 8 + heightLine,
-  );
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(widthLabel, rightX - Math.max(16, widthTextWidth / 2 + 8), centerY);
 
-  // fundo e etiqueta para o valor do diâmetro (linha vertical)
-  ctx.fillStyle = 'white';
-  ctx.fillRect(
-    centerX + 8,
-    centerY - heightLine / 2 - 6,
-    heightTextWidth + 16,
-    heightLine + 8,
-  );
-  ctx.fillStyle = '#666';
-  ctx.fillText(
-    heightLabel,
-    centerX + 8 + 4,
-    centerY + heightLine / 2 + 2,
-  );
+  ctx.textAlign = 'left';
+  ctx.fillText(heightLabel, centerX + 10, bottomY - Math.max(12, heightLine / 2 + 4));
   ctx.restore();
 }
 
