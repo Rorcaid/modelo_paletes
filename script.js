@@ -85,6 +85,7 @@ function fillPal() {
   const shape = document.getElementById('shape').value;
   const allowExceed = document.getElementById('allowExceed').checked;
   let count = 0;
+  let firstMeasurementDrawn = false;
 
   // Caso: bobines circulares (circle)
   if (shape === 'circle') {
@@ -113,6 +114,10 @@ function fillPal() {
         ctx.fillStyle = '#7FB3D5';
         ctx.fill();
         ctx.stroke();
+        if (!firstMeasurementDrawn) {
+          drawBobineMeasurements(ctx, x, y, diameter, diameter, 'circle');
+          firstMeasurementDrawn = true;
+        }
         count++;
       }
     }
@@ -167,6 +172,10 @@ function fillPal() {
         ctx.fillStyle = '#F5B041';
         ctx.fill();
         ctx.stroke();
+        if (!firstMeasurementDrawn) {
+          drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
+          firstMeasurementDrawn = true;
+        }
         count++;
       }
     }
@@ -186,6 +195,10 @@ function fillPal() {
         ctx.fillStyle = '#F8C471';
         ctx.fill();
         ctx.stroke();
+        if (!firstMeasurementDrawn) {
+          drawBobineMeasurements(ctx, x, y, cylHeight, cylWidth, 'cylinder');
+          firstMeasurementDrawn = true;
+        }
         count++;
       }
     }
@@ -248,6 +261,74 @@ function drawPaletMeasurements(canvas, ctx) {
       <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" fill="#666" transform="rotate(90 50% 50%)">${height} mm</text>
     </svg>
   `;
+}
+
+function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType) {
+  ctx.save();
+  ctx.strokeStyle = '#666';
+  ctx.fillStyle = '#666';
+  ctx.lineWidth = 0.5;
+
+  const halfW = width / 2;
+  const halfH = height / 2;
+  const inset = Math.min(12, halfW * 0.15, halfH * 0.15);
+  const leftX = centerX - halfW + inset;
+  const rightX = centerX + halfW - inset;
+  const topY = centerY - halfH + inset;
+  const bottomY = centerY + halfH - inset;
+
+  // Linha horizontal e traços nas extremidades
+  ctx.beginPath();
+  ctx.moveTo(leftX, centerY);
+  ctx.lineTo(rightX, centerY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(leftX, centerY - 8);
+  ctx.lineTo(leftX, centerY + 8);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(rightX, centerY - 8);
+  ctx.lineTo(rightX, centerY + 8);
+  ctx.stroke();
+
+  // Linha vertical e traços nas extremidades
+  ctx.beginPath();
+  ctx.moveTo(centerX, topY);
+  ctx.lineTo(centerX, bottomY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(centerX - 8, topY);
+  ctx.lineTo(centerX + 8, topY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(centerX - 8, bottomY);
+  ctx.lineTo(centerX + 8, bottomY);
+  ctx.stroke();
+
+  const labelText =
+    shapeType === 'circle'
+      ? `${Math.round(width)} mm`
+      : `${Math.round(width)} × ${Math.round(height)} mm`;
+  ctx.font = '12px sans-serif';
+  const textMetrics = ctx.measureText(labelText);
+  const textWidth = textMetrics.width;
+  const textHeight = 14;
+
+  ctx.fillStyle = 'white';
+  ctx.fillRect(
+    centerX - textWidth / 2 - 6,
+    centerY - textHeight / 2 - 4,
+    textWidth + 12,
+    textHeight + 8,
+  );
+
+  ctx.fillStyle = '#666';
+  ctx.fillText(
+    labelText,
+    centerX - textWidth / 2,
+    centerY + textHeight / 2 - 5,
+  );
+  ctx.restore();
 }
 
 // Gera download da imagem do canvas

@@ -15,6 +15,7 @@ function fillPalHex() {
   const shape = document.getElementById('shape').value;
   const allowExceed = document.getElementById('allowExceed').checked;
   let count = 0;
+  let firstMeasurementDrawn = false;
 
   // Gerador de centros em embalagem hexagonal dentro de um rect
   // rect: {x,y,width,height}, d = spacing/diâmetro
@@ -145,6 +146,10 @@ function fillPalHex() {
       ctx.fillStyle = '#7FB3D5';
       ctx.fill();
       ctx.stroke();
+      if (!firstMeasurementDrawn) {
+        drawBobineMeasurements(ctx, c.x, c.y, diameter, diameter, 'circle');
+        firstMeasurementDrawn = true;
+      }
       count++;
     });
   } else if (shape === 'cylinder') {
@@ -300,6 +305,10 @@ function fillPalHex() {
       ctx.fillStyle = '#F5B041';
       ctx.fill();
       ctx.stroke();
+      if (!firstMeasurementDrawn) {
+        drawBobineMeasurements(ctx, c.x, c.y, cylWidth, cylHeight, 'cylinder');
+        firstMeasurementDrawn = true;
+      }
       count++;
     });
 
@@ -309,6 +318,10 @@ function fillPalHex() {
       ctx.fillStyle = '#F8C471';
       ctx.fill();
       ctx.stroke();
+      if (!firstMeasurementDrawn) {
+        drawBobineMeasurements(ctx, c.x, c.y, cylHeight, cylWidth, 'cylinder');
+        firstMeasurementDrawn = true;
+      }
       count++;
     });
   }
