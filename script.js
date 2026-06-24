@@ -203,9 +203,9 @@ function drawPaletMeasurements(canvas, ctx) {
   // Largura (abaixo) - linha fina ao longo da largura com gap para o texto
   const widthDiv = document.getElementById('widthMeasure');
   const textWidthPercent = 20; // percentagem de espaço para o texto
-  const leftGapStart = (50 - textWidthPercent / 2);
-  const leftGapEnd = (50 + textWidthPercent / 2);
-  
+  const leftGapStart = 50 - textWidthPercent / 2;
+  const leftGapEnd = 50 + textWidthPercent / 2;
+
   widthDiv.innerHTML = `
     <svg style="width: 100%; height: 100%; position: absolute; bottom: 0; left: 0;">
       <!-- Linha à esquerda do texto -->
@@ -226,9 +226,9 @@ function drawPaletMeasurements(canvas, ctx) {
   // Altura (à direita) - linha fina ao longo da altura com gap para o texto
   const heightDiv = document.getElementById('heightMeasure');
   const textHeightPercent = 20; // percentagem de espaço para o texto
-  const topGapStart = (50 - textHeightPercent / 2);
-  const topGapEnd = (50 + textHeightPercent / 2);
-  
+  const topGapStart = 50 - textHeightPercent / 2;
+  const topGapEnd = 50 + textHeightPercent / 2;
+
   heightDiv.innerHTML = `
     <svg style="width: 100%; height: 100%; position: absolute; top: 0; right: 0;">
       <!-- Linha acima do texto -->
