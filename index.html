@@ -73,11 +73,12 @@
               style="display: none"></button>
 
             <!-- 4) Download Image -->
-            <button type="button" onclick="downloadCanvas()">
-              Download Image
-            </button>
+            <!-- Download Image moved to sidebar footer -->
           </div>
         </form>
+        <div id="sidebarFooter">
+          <button type="button" id="downloadImageBtn" onclick="downloadCanvas()">Download Image</button>
+        </div>
       </aside>
 
       <main id="preview">
