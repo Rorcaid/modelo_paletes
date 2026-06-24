@@ -196,7 +196,7 @@ function fillPal() {
         ctx.fill();
         ctx.stroke();
         if (!firstMeasurementDrawn) {
-          drawBobineMeasurements(ctx, x, y, cylHeight, cylWidth, 'cylinder');
+          drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
           firstMeasurementDrawn = true;
         }
         count++;
@@ -307,10 +307,10 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
 
   const labelLines =
     shapeType === 'circle'
-      ? [`${Math.round(width)} mm`]
-      : [`${Math.round(width)} mm`, `${Math.round(height)} mm`];
+      ? [`Width: ${Math.round(width)} mm`, `Diameter: ${Math.round(width)} mm`]
+      : [`Width: ${Math.round(width)} mm`, `Diameter: ${Math.round(height)} mm`];
   ctx.font = '14px sans-serif';
-  const lineHeight = 18;
+  const lineHeight = 20;
   const textWidths = labelLines.map((line) => ctx.measureText(line).width);
   const textWidth = Math.max(...textWidths);
   const textHeight = labelLines.length * lineHeight;

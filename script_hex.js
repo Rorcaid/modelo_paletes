@@ -319,7 +319,7 @@ function fillPalHex() {
       ctx.fill();
       ctx.stroke();
       if (!firstMeasurementDrawn) {
-        drawBobineMeasurements(ctx, c.x, c.y, cylHeight, cylWidth, 'cylinder');
+        drawBobineMeasurements(ctx, c.x, c.y, cylWidth, cylHeight, 'cylinder');
         firstMeasurementDrawn = true;
       }
       count++;
