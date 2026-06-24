@@ -92,6 +92,28 @@ form#controls {
   flex-wrap: wrap;
 }
 
+/* Arrange circle and cylinder inputs vertically and aligned */
+#circleInputs,
+#cylinderInputs {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+#circleInputs label,
+#cylinderInputs label {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#circleInputs input,
+#cylinderInputs input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Stack action buttons vertically for a clean sidebar flow */
 form#controls .form-row:last-of-type {
   display: flex;
