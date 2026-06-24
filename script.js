@@ -305,29 +305,32 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
   ctx.lineTo(centerX + 8, bottomY);
   ctx.stroke();
 
-  const labelText =
+  const labelLines =
     shapeType === 'circle'
-      ? `${Math.round(width)} mm`
-      : `${Math.round(width)} × ${Math.round(height)} mm`;
-  ctx.font = '12px sans-serif';
-  const textMetrics = ctx.measureText(labelText);
-  const textWidth = textMetrics.width;
-  const textHeight = 14;
+      ? [`${Math.round(width)} mm`]
+      : [`${Math.round(width)} mm`, `${Math.round(height)} mm`];
+  ctx.font = '14px sans-serif';
+  const lineHeight = 18;
+  const textWidths = labelLines.map((line) => ctx.measureText(line).width);
+  const textWidth = Math.max(...textWidths);
+  const textHeight = labelLines.length * lineHeight;
 
   ctx.fillStyle = 'white';
   ctx.fillRect(
-    centerX - textWidth / 2 - 6,
-    centerY - textHeight / 2 - 4,
-    textWidth + 12,
-    textHeight + 8,
+    centerX - textWidth / 2 - 8,
+    centerY - textHeight / 2 - 6,
+    textWidth + 16,
+    textHeight + 12,
   );
 
   ctx.fillStyle = '#666';
-  ctx.fillText(
-    labelText,
-    centerX - textWidth / 2,
-    centerY + textHeight / 2 - 5,
-  );
+  labelLines.forEach((line, index) => {
+    ctx.fillText(
+      line,
+      centerX - textWidth / 2,
+      centerY - textHeight / 2 + lineHeight * (index + 0.85),
+    );
+  });
   ctx.restore();
 }
 
