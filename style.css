@@ -92,6 +92,37 @@ form#controls {
   flex-wrap: wrap;
 }
 
+/* Stack action buttons vertically for a clean sidebar flow */
+form#controls .form-row:last-of-type {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+form#controls .form-row:last-of-type button {
+  width: 100%;
+  text-align: center;
+}
+
+/* Keep toggles visually subtle but full-width to match the stacked layout */
+#exceedToggle,
+#linearToggle {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+}
+
+/* Slightly separate groups on narrow screens */
+@media (max-width: 480px) {
+  form#controls {
+    padding: 12px;
+  }
+  form#controls .form-row:last-of-type {
+    gap: 8px;
+  }
+}
+
 /* Labels e inputs básicos */
 label {
   font-size: 13px;
@@ -124,7 +155,9 @@ button {
   cursor: pointer;
   font-weight: 700;
   color: #1b1b1b;
-  transition: background 120ms ease, transform 80ms ease;
+  transition:
+    background 120ms ease,
+    transform 80ms ease;
 }
 
 button:hover {
