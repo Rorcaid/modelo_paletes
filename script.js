@@ -284,34 +284,6 @@ function drawBobineMeasurements(
   const topY = centerY - halfH + inset;
   const bottomY = centerY + halfH - inset;
 
-  // Linha horizontal e traços nas extremidades
-  ctx.beginPath();
-  ctx.moveTo(leftX, centerY);
-  ctx.lineTo(rightX, centerY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(leftX, centerY - 8);
-  ctx.lineTo(leftX, centerY + 8);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(rightX, centerY - 8);
-  ctx.lineTo(rightX, centerY + 8);
-  ctx.stroke();
-
-  // Linha vertical e traços nas extremidades
-  ctx.beginPath();
-  ctx.moveTo(centerX, topY);
-  ctx.lineTo(centerX, bottomY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(centerX - 8, topY);
-  ctx.lineTo(centerX + 8, topY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(centerX - 8, bottomY);
-  ctx.lineTo(centerX + 8, bottomY);
-  ctx.stroke();
-
   const widthLabel = `${Math.round(width)} mm`;
   const heightLabel = `${Math.round(height)} mm`;
   ctx.font = 'bold 24px sans-serif';
@@ -320,15 +292,16 @@ function drawBobineMeasurements(
   const heightTextWidth = ctx.measureText(heightLabel).width;
   const widthGap = widthTextWidth + padding * 2;
   const heightGap = heightTextWidth + padding * 2;
+
+  // Largura (horizontal) - linha fina ao longo da largura com gap para o texto
   const widthGapEnd = rightX - 4;
   const widthGapStart = widthGapEnd - widthGap;
+
+  // Altura (vertical) - linha fina ao longo da altura com gap para o texto
   const heightGapEnd = bottomY - 4;
   const heightGapStart = heightGapEnd - heightGap;
 
-  ctx.strokeStyle = '#666';
-  ctx.lineWidth = 0.5;
-
-  // Linha horizontal com gap perto da extremidade direita
+  // Linha horizontal com gap para o texto de largura
   ctx.beginPath();
   ctx.moveTo(leftX, centerY);
   ctx.lineTo(widthGapStart, centerY);
@@ -344,7 +317,7 @@ function drawBobineMeasurements(
   ctx.lineTo(rightX, centerY + 8);
   ctx.stroke();
 
-  // Linha vertical com gap perto da extremidade inferior
+  // Linha vertical com gap para o texto de altura
   ctx.beginPath();
   ctx.moveTo(centerX, topY);
   ctx.lineTo(centerX, heightGapStart);
@@ -360,20 +333,16 @@ function drawBobineMeasurements(
   ctx.lineTo(centerX + 8, bottomY);
   ctx.stroke();
 
-  // Texto da largura próximo da extremidade direita
   ctx.fillStyle = '#666';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(widthLabel, widthGapStart + widthGap / 2, centerY);
 
-  // Texto do diâmetro próximo da extremidade inferior, rotacionado como na palete
   const heightGapMiddle = heightGapStart + heightGap / 2;
   ctx.save();
-  ctx.translate(centerX, centerY);
+  ctx.translate(centerX, heightGapMiddle);
   ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(heightLabel, heightGapMiddle - centerY, 0);
+  ctx.fillText(heightLabel, 0, 0);
   ctx.restore();
   ctx.restore();
 }
