@@ -308,20 +308,20 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
   const widthLabel = `${Math.round(width)} mm`;
   const heightLabel = `${Math.round(height)} mm`;
   ctx.font = 'bold 11px sans-serif';
-  const padding = 6;
+  const padding = 4;
   const widthTextWidth = ctx.measureText(widthLabel).width;
   const heightTextWidth = ctx.measureText(heightLabel).width;
-  const widthGapHalf = widthTextWidth / 2 + padding;
-  const heightGapHalf = heightTextWidth / 2 + padding;
-  const widthGapStart = centerX - widthGapHalf;
-  const widthGapEnd = centerX + widthGapHalf;
-  const heightGapStart = centerY - heightGapHalf;
-  const heightGapEnd = centerY + heightGapHalf;
+  const widthGap = widthTextWidth + padding * 2;
+  const heightGap = heightTextWidth + padding * 2;
+  const widthGapEnd = rightX - 4;
+  const widthGapStart = widthGapEnd - widthGap;
+  const heightGapEnd = bottomY - 4;
+  const heightGapStart = heightGapEnd - heightGap;
 
   ctx.strokeStyle = '#666';
   ctx.lineWidth = 0.5;
 
-  // Linha horizontal com gap central para o texto
+  // Linha horizontal com gap perto da extremidade direita
   ctx.beginPath();
   ctx.moveTo(leftX, centerY);
   ctx.lineTo(widthGapStart, centerY);
@@ -337,7 +337,7 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
   ctx.lineTo(rightX, centerY + 8);
   ctx.stroke();
 
-  // Linha vertical com gap central para o texto
+  // Linha vertical com gap perto da extremidade inferior
   ctx.beginPath();
   ctx.moveTo(centerX, topY);
   ctx.lineTo(centerX, heightGapStart);
@@ -353,19 +353,20 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
   ctx.lineTo(centerX + 8, bottomY);
   ctx.stroke();
 
-  // Texto da largura (horizontal) centrado na linha
+  // Texto da largura próximo da extremidade direita
   ctx.fillStyle = '#666';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(widthLabel, centerX, centerY - 8);
+  ctx.fillText(widthLabel, widthGapStart + widthGap / 2, centerY);
 
-  // Texto do diâmetro (vertical) centrado na linha, ligeiramente à direita para não sobrepor
+  // Texto do diâmetro próximo da extremidade inferior, rotacionado como na palete
+  const heightGapMiddle = heightGapStart + heightGap / 2;
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(heightLabel, 0, -8);
+  ctx.fillText(heightLabel, heightGapMiddle - centerY, 0);
   ctx.restore();
   ctx.restore();
 }
