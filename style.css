@@ -74,45 +74,68 @@ body {
 /* Controlo / Formulário */
 form#controls {
   width: 100%;
-  height: 100%;
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fafafa;
+  padding: 18px;
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
 }
+
 .form-row {
-  margin: 12px 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
+  margin: 0;
+  flex-wrap: wrap;
 }
 
 /* Labels e inputs básicos */
 label {
-  font-size: 14px;
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
 }
+
 input[type='number'],
 select {
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 8px 10px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
   font-size: 14px;
+  background: #fff;
+  min-width: 100px;
+}
+
+/* Make inputs grow to available space in rows */
+.form-row > input,
+.form-row > select {
+  flex: 1 1 auto;
 }
 
 /* Botões simples */
 button {
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: 1px solid #888;
-  background: #eee;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #f6f8fb;
   cursor: pointer;
+  font-weight: 700;
+  color: #1b1b1b;
+  transition: background 120ms ease, transform 80ms ease;
 }
+
 button:hover {
-  background: #e0e0e0;
+  background: #eef6ff;
+  transform: translateY(-1px);
+}
+
+/* Active buttons (toggles) */
+button.active {
+  background: #dff0ff;
+  border-color: #bfe6ff;
 }
 
 /* Canvas (tamanho base igual ao modelo) */
