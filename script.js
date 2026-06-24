@@ -307,8 +307,8 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
 
   const widthLabel = `${Math.round(width)} mm`;
   const heightLabel = `${Math.round(height)} mm`;
-  ctx.font = '14px sans-serif';
-  const heightLine = 20;
+  ctx.font = 'bold 11px sans-serif';
+  const heightLine = 16;
   const widthTextWidth = ctx.measureText(widthLabel).width;
   const heightTextWidth = ctx.measureText(heightLabel).width;
 
