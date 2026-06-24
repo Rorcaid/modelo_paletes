@@ -10,6 +10,9 @@ function updateCanvasSize() {
   canvas.setAttribute('data-logical-height', height);
   // ajusta o CSS display size para caber na viewport sem distorção
   autosizeCanvas();
+  // atualiza as medidas quando a paleta é alterada
+  const ctx = canvas.getContext('2d');
+  drawPaletMeasurements(canvas, ctx);
 }
 
 // Garante que o canvas CSS size se ajusta à viewport mantendo a proporção lógica
