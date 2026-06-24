@@ -46,9 +46,9 @@ window.addEventListener('resize', autosizeCanvas);
 function toggleCylinderInputs() {
   const shape = document.getElementById('shape').value;
   document.getElementById('circleInputs').style.display =
-    shape === 'circle' ? 'inline' : 'none';
+    shape === 'circle' ? 'flex' : 'none';
   document.getElementById('cylinderInputs').style.display =
-    shape === 'cylinder' ? 'inline' : 'none';
+    shape === 'cylinder' ? 'flex' : 'none';
 }
 
 // Calcula quantas células cabem (count) e o offset para centralizar a grelha
@@ -377,5 +377,7 @@ function downloadCanvas() {
 // inicializa tamanho do canvas ao carregar a página
 window.onload = function () {
   updateCanvasSize();
+  // ensure correct inputs visibility on load
+  toggleCylinderInputs();
   // ...existing code... (se houver mais inicializações)
 };

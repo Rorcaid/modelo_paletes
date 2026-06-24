@@ -95,10 +95,14 @@ form#controls {
 /* Arrange circle and cylinder inputs vertically and aligned */
 #circleInputs,
 #cylinderInputs {
-  display: flex !important;
   flex-direction: column;
   gap: 8px;
   width: 100%;
+}
+
+/* Hide cylinder inputs by default; JS will show the active set */
+#cylinderInputs {
+  display: none;
 }
 
 #circleInputs label,
