@@ -23,15 +23,16 @@ function autosizeCanvas() {
     parseFloat(canvas.getAttribute('data-logical-width')) || canvas.width;
   const logicalH =
     parseFloat(canvas.getAttribute('data-logical-height')) || canvas.height;
-  // calcular espaço disponível (reservar espaço para controles e contador)
-  const controls = document.getElementById('controls');
-  const controlsHeight = controls
-    ? controls.getBoundingClientRect().height
-    : 120;
-  const margin = 32; // margem total horizontal
-  const extraVert = 120; // espaço reservado acima/below controls (ajuste se necessário)
-  const availW = Math.max(200, window.innerWidth - margin);
-  const availH = Math.max(200, window.innerHeight - controlsHeight - extraVert);
+  // calcular espaço disponível dentro do wrapper, reservando espaço para as medidas externas
+  const wrapper = document.querySelector('.canvas-wrapper');
+  const wrapperRect = wrapper
+    ? wrapper.getBoundingClientRect()
+    : {
+        width: Math.max(200, window.innerWidth - 32),
+        height: Math.max(200, window.innerHeight - 150),
+      };
+  const availW = Math.max(200, wrapperRect.width - 50);
+  const availH = Math.max(200, wrapperRect.height - 40);
   const scale = Math.min(availW / logicalW, availH / logicalH);
   // aplica CSS size proporcional (mantém a mesma razão para evitar ovalização)
   canvas.style.width = Math.round(logicalW * scale) + 'px';
@@ -216,8 +217,26 @@ function drawPaletMeasurements(canvas, ctx) {
   const width = canvas.width;
   const height = canvas.height;
 
-  // Largura (abaixo) - linha fina ao longo da largura com gap para o texto
   const widthDiv = document.getElementById('widthMeasure');
+  const heightDiv = document.getElementById('heightMeasure');
+
+  // Posiciona as medidas externas em relação ao canvas renderizado,
+  // não à largura total do wrapper.
+  const canvasLeft = canvas.offsetLeft;
+  const canvasTop = canvas.offsetTop;
+  const canvasW = canvas.offsetWidth;
+  const canvasH = canvas.offsetHeight;
+
+  widthDiv.style.left = canvasLeft + 'px';
+  widthDiv.style.width = canvasW + 'px';
+  widthDiv.style.bottom = '0';
+  widthDiv.style.right = 'auto';
+
+  heightDiv.style.left = canvasLeft + canvasW + 'px';
+  heightDiv.style.top = canvasTop + 'px';
+  heightDiv.style.height = canvasH + 'px';
+  heightDiv.style.right = 'auto';
+
   const textWidthPercent = 20; // percentagem de espaço para o texto
   const leftGapStart = 50 - textWidthPercent / 2;
   const leftGapEnd = 50 + textWidthPercent / 2;
@@ -240,7 +259,6 @@ function drawPaletMeasurements(canvas, ctx) {
   `;
 
   // Altura (à direita) - linha fina ao longo da altura com gap para o texto
-  const heightDiv = document.getElementById('heightMeasure');
   const textHeightPercent = 20; // percentagem de espaço para o texto
   const topGapStart = 50 - textHeightPercent / 2;
   const topGapEnd = 50 + textHeightPercent / 2;
