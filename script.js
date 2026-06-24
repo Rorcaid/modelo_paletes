@@ -263,7 +263,14 @@ function drawPaletMeasurements(canvas, ctx) {
   `;
 }
 
-function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType) {
+function drawBobineMeasurements(
+  ctx,
+  centerX,
+  centerY,
+  width,
+  height,
+  shapeType,
+) {
   ctx.save();
   ctx.strokeStyle = '#666';
   ctx.fillStyle = '#666';
@@ -307,7 +314,11 @@ function drawBobineMeasurements(ctx, centerX, centerY, width, height, shapeType)
 
   const widthLabel = `${Math.round(width)} mm`;
   const heightLabel = `${Math.round(height)} mm`;
-  ctx.font = 'bold 11px sans-serif';
+  const cssFontSize = 11;
+  const displayScale =
+    ctx.canvas.getBoundingClientRect().width / ctx.canvas.width || 1;
+  const internalFontSize = cssFontSize / displayScale;
+  ctx.font = `bold ${internalFontSize.toFixed(2)}px sans-serif`;
   const padding = 4;
   const widthTextWidth = ctx.measureText(widthLabel).width;
   const heightTextWidth = ctx.measureText(heightLabel).width;
