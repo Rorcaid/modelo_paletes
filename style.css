@@ -135,14 +135,20 @@ form#controls {
 }
 
 /* Stack action buttons vertically for a clean sidebar flow */
-form#controls .form-row:last-of-type {
+
+/* Dedicated control buttons block that sits between the inputs and footer.
+   Using auto margins in the sidebar flex context allows vertical centering
+   between the preceding content (inputs/labels) and the footer (download). */
+#controlButtons {
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: stretch;
+  width: 80%;
+  margin: auto; /* centers block vertically between siblings in flex */
 }
 
-form#controls .form-row:last-of-type button {
+#controlButtons button {
   width: 100%;
   text-align: center;
 }
