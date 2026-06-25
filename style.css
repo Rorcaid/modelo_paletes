@@ -45,19 +45,24 @@ body {
   padding: 0 8px;
 }
 
-#pageFooter {
-  display: flex;
-  justify-content: center;
-  padding: 16px;
+#pageFooter button {
+  margin-top: auto;
+  padding-top: 16px;
 }
 
-#pageFooter button {
-  padding: 12px 24px;
-  border-radius: 10px;
+#sidebarFooter {
+  margin-top: auto;
+  padding-top: 16px;
+  width: 100%;
+}
+
+#sidebarFooter button {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
   background: #fff8e6;
   border: 1px solid #f1e0b8;
   font-weight: 700;
-  font-size: 14px;
 }
 
 #canvasContainer {
@@ -160,7 +165,8 @@ form#controls {
   gap: 10px;
   align-items: stretch;
   width: 80%;
-  margin: auto; /* centers block vertically between siblings in flex */
+  margin: auto;
+  flex: 1;
 }
 
 #controlButtons button {
