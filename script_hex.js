@@ -44,7 +44,7 @@ function fillPalHex() {
       );
     }
 
-    // Opção A: filas horizontais, offset alternado em x
+    // Opção A: filas horizontais, offset alternado em x (hex standard)
     const centersA = [];
     let row = 0;
     for (let y = rect.y + r; y <= rect.y + rect.height - r + 1e-6; y += step, row++) {
@@ -64,9 +64,76 @@ function fillPalHex() {
       }
     }
 
-    const filteredA = centerAndFilter(centersA);
-    const filteredB = centerAndFilter(centersB);
-    return filteredA.length >= filteredB.length ? filteredA : filteredB;
+    // Opção C: filas com spread máximo — permite círculos mais afastados entre si
+    // (encontra arranjos como 2+1 ou 1+2 onde os círculos não se tocam mas cabem)
+    function generateSpreadRows(W, H, swapped) {
+      const maxN = Math.floor(W / d);
+      if (maxN <= 0) return [];
+
+      // x positions para n círculos espalhados da borda à borda
+      function rowXs(n) {
+        if (n <= 0) return null;
+        if (n === 1) return [W / 2];
+        const spacing = (W - d) / (n - 1);
+        if (spacing < d - 1e-6) return null; // sobreposição
+        const xs = [];
+        for (let i = 0; i < n; i++) xs.push(r + i * spacing);
+        return xs;
+      }
+
+      // y mínimo para a fila atual dadas as xs da fila anterior
+      function minRowY(curXs, prevXs, prevY) {
+        let minY = prevY + r;
+        for (const xp of prevXs) {
+          for (const xc of curXs) {
+            const dx = Math.abs(xp - xc);
+            if (dx < d - 1e-6) minY = Math.max(minY, prevY + Math.sqrt(d * d - dx * dx));
+          }
+        }
+        return minY;
+      }
+
+      let best = [];
+      for (let n0 = maxN; n0 >= 1; n0--) {
+        const xs0 = rowXs(n0);
+        if (!xs0) continue;
+        const rows = [{ xs: xs0, y: r }];
+
+        for (let level = 1; level <= 4; level++) {
+          const prev = rows[level - 1];
+          let nextRow = null;
+          for (let n = maxN; n >= 1; n--) {
+            const xs = rowXs(n);
+            if (!xs) continue;
+            const y = minRowY(xs, prev.xs, prev.y);
+            if (y + r <= H + 1e-6) { nextRow = { xs, y }; break; }
+          }
+          if (!nextRow) break;
+          rows.push(nextRow);
+        }
+
+        const total = rows.reduce((s, row) => s + row.xs.length, 0);
+        if (total > best.length) {
+          best = rows.flatMap(row =>
+            swapped
+              ? row.xs.map(x => ({ x: row.y, y: x }))
+              : row.xs.map(x => ({ x, y: row.y }))
+          );
+        }
+      }
+      return best;
+    }
+
+    const centersC = generateSpreadRows(rect.width, rect.height, false).map(c => ({
+      x: c.x + rect.x, y: c.y + rect.y,
+    }));
+    const centersD = generateSpreadRows(rect.height, rect.width, true).map(c => ({
+      x: c.x + rect.x, y: c.y + rect.y,
+    }));
+
+    const candidates = [centersA, centersB, centersC, centersD]
+      .map(cs => centerAndFilter(cs.map(c => ({ x: c.x, y: c.y }))));
+    return candidates.reduce((a, b) => a.length >= b.length ? a : b);
   }
 
   // Gerador retangular centrado na área (garante espaçamento vertical = spacingH, evita sobreposição de elipses altas)
