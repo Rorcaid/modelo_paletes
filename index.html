@@ -117,6 +117,18 @@
         fillPalActive();
       }
 
+      // submete ao pressionar Enter em qualquer input numérico
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('input[type="number"]').forEach(function (input) {
+          input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              fillPalActive();
+            }
+          });
+        });
+      });
+
       // wrapper que chama a implementação activa
       function fillPalActive() {
         if (window.linearDisposition) {
