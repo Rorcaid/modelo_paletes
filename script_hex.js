@@ -131,65 +131,46 @@ function fillPalHex() {
       x: c.x + rect.x, y: c.y + rect.y,
     }));
 
-    // Opção E: filas iguais com offset geral — cobre arranjos como 2+2, 4+4+4, 3+3+3+3, etc.
-    // Para cada (n colunas, m filas) calcula o offset t mínimo tal que:
-    //   • as m filas cabem na altura H  →  dy = (H-2r)/(m-1),  t = sqrt(d²-dy²)
-    //   • as duas filas alternadas cabem na largura W  →  t ≤ W-2r-(n-1)*d
-    //   • filas de mesma paridade (afastadas 2·dy) não se sobrepõem  →  2·dy ≥ d  (m>2)
-    function generateEqualRowsGeneral(W, H, swapped) {
+    // Opção E: filas iguais com espaçamento óptimo — encontra arranjos como 2+2
+    // onde o hex standard não cabe centrado mas um S ligeiramente maior cabe
+    function generateEqualRowsOptimal(W, H, swapped) {
+      const maxN = Math.floor(W / d);
       let best = [];
-      const maxN = Math.floor((W - 2 * r) / d) + 1;
-      const maxM = Math.floor(H / (d / 2)) + 1;
+      for (let n = maxN; n >= 1; n--) {
+        // Bounding box das 2 filas (fila 0: n círculos; fila 1 offset: n círculos)
+        // x1 = W/2 - (2n-1)*S/4   (centra o bbox)
+        // Restrição altura: sqrt(d²-(S/2)²) ≤ H-2r  →  S ≥ 2*sqrt(d²-(H-2r)²)
+        const H_slack = H - 2 * r;
+        const S_min_h = H_slack >= d ? 0 : 2 * Math.sqrt(d * d - H_slack * H_slack);
+        const S_min = Math.max(d, S_min_h); // não pode sobrepor dentro da fila
+        // Restrição largura: x1 ≥ r  →  S ≤ 4*(W/2-r)/(2n-1)
+        const S_max = 4 * (W / 2 - r) / (2 * n - 1);
+        if (S_min > S_max + 1e-6) continue;
 
-      for (let m = maxM; m >= 1; m--) {
-        for (let n = maxN; n >= 1; n--) {
-          if (n * m <= best.length) continue;
-          if ((n - 1) * d > W - 2 * r + 1e-6) continue;
+        const S = S_min;
+        const x1 = W / 2 - (2 * n - 1) * S / 4;
+        const dy = Math.sqrt(Math.max(0, d * d - (S / 2) * (S / 2)));
 
-          let t, dy;
-          if (m === 1) {
-            t = 0;
-            dy = 0;
-          } else {
-            const dy_avail = (H - 2 * r) / (m - 1);
-            if (dy_avail < 0) continue;
-            // filas de mesma paridade estão 2·dy afastadas (mesmo x) — não podem sobrepor
-            if (m > 2 && 2 * dy_avail < d - 1e-6) continue;
-            if (dy_avail >= d) {
-              // filas suficientemente afastadas: sem necessidade de offset horizontal
-              t = 0;
-              dy = dy_avail;
-            } else {
-              // offset mínimo para círculos adjacentes entre filas apenas se tocarem
-              t = Math.sqrt(Math.max(0, d * d - dy_avail * dy_avail));
-              dy = dy_avail;
-              const t_max = W - 2 * r - (n - 1) * d;
-              if (t > t_max + 1e-6) continue;
-            }
+        const centers = [];
+        let y = r;
+        let parity = 0;
+        while (y + r <= H + 1e-6) {
+          const xOff = parity === 1 ? S / 2 : 0;
+          for (let i = 0; i < n; i++) {
+            centers.push(swapped
+              ? { x: y, y: x1 + xOff + i * S }
+              : { x: x1 + xOff + i * S, y });
           }
-
-          // centrar o bbox total: fila par começa em a, fila ímpar em a+t
-          const a = W / 2 - ((n - 1) * d + t) / 2;
-
-          const centers = [];
-          for (let row = 0; row < m; row++) {
-            const xOff = row % 2 === 0 ? 0 : t;
-            const row_y = r + row * dy;
-            for (let col = 0; col < n; col++) {
-              const col_x = a + xOff + col * d;
-              centers.push(swapped
-                ? { x: row_y + rect.x, y: col_x + rect.y }
-                : { x: col_x + rect.x, y: row_y + rect.y });
-            }
-          }
-          if (centers.length > best.length) best = centers;
+          y += dy > 1e-6 ? dy : H + 1; // evita loop infinito
+          parity = 1 - parity;
         }
+        if (centers.length > best.length) best = centers;
       }
-      return best;
+      return best.map(c => ({ x: c.x + rect.x, y: c.y + rect.y }));
     }
 
-    const centersE = generateEqualRowsGeneral(rect.width, rect.height, false);
-    const centersF = generateEqualRowsGeneral(rect.height, rect.width, true);
+    const centersE = generateEqualRowsOptimal(rect.width, rect.height, false);
+    const centersF = generateEqualRowsOptimal(rect.height, rect.width, true);
 
     const candidates = [centersA, centersB, centersC, centersD, centersE, centersF]
       .map(cs => centerAndFilter(cs.map(c => ({ x: c.x, y: c.y }))));
