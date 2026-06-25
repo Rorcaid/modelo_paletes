@@ -117,8 +117,8 @@
         fillPalActive();
       }
 
-      // submete ao pressionar Enter em qualquer input numérico
       document.addEventListener('DOMContentLoaded', function () {
+        // submete ao pressionar Enter em qualquer input numérico
         document.querySelectorAll('input[type="number"]').forEach(function (input) {
           input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
@@ -127,6 +127,16 @@
             }
           });
         });
+
+        // reposiciona as medidas da palete sempre que o canvas muda de tamanho visual
+        const canvas = document.getElementById('palCanvas');
+        if (canvas && typeof drawPaletMeasurements === 'function') {
+          const ro = new ResizeObserver(function () {
+            const ctx = canvas.getContext('2d');
+            drawPaletMeasurements(canvas, ctx);
+          });
+          ro.observe(canvas);
+        }
       });
 
       // wrapper que chama a implementação activa
