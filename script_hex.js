@@ -21,55 +21,52 @@ function fillPalHex() {
   // rect: {x,y,width,height}, d = spacing/diâmetro
   function generateHexCentersInRect(rect, d) {
     const r = d / 2;
-    const vStep = Math.sqrt(3) * r; // vertical spacing between rows
-    const centers = [];
-    // primeira linha y começando em rect.y + r
+    const step = Math.sqrt(3) * r; // passo hex entre filas/colunas
+
+    function centerAndFilter(centers) {
+      if (centers.length === 0) return centers;
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      centers.forEach((c) => {
+        if (c.x < minX) minX = c.x;
+        if (c.x > maxX) maxX = c.x;
+        if (c.y < minY) minY = c.y;
+        if (c.y > maxY) maxY = c.y;
+      });
+      const dx = (rect.x + rect.width / 2) - (minX + maxX) / 2;
+      const dy = (rect.y + rect.height / 2) - (minY + maxY) / 2;
+      centers.forEach((c) => { c.x += dx; c.y += dy; });
+      return centers.filter(
+        (c) =>
+          c.x - r >= rect.x - 1e-6 &&
+          c.x + r <= rect.x + rect.width + 1e-6 &&
+          c.y - r >= rect.y - 1e-6 &&
+          c.y + r <= rect.y + rect.height + 1e-6,
+      );
+    }
+
+    // Opção A: filas horizontais, offset alternado em x
+    const centersA = [];
     let row = 0;
-    for (
-      let y = rect.y + r;
-      y <= rect.y + rect.height - r + 1e-6;
-      y += vStep, row++
-    ) {
+    for (let y = rect.y + r; y <= rect.y + rect.height - r + 1e-6; y += step, row++) {
       const shift = row % 2 === 1 ? d / 2 : 0;
-      // x inicia em rect.x + r + shift
-      for (
-        let x = rect.x + r + shift;
-        x <= rect.x + rect.width - r + 1e-6;
-        x += d
-      ) {
-        centers.push({ x, y });
+      for (let x = rect.x + r + shift; x <= rect.x + rect.width - r + 1e-6; x += d) {
+        centersA.push({ x, y });
       }
     }
-    // centra o conjunto de centros dentro do rect (ajusta Bounding Box)
-    if (centers.length === 0) return centers;
-    let minX = Infinity,
-      maxX = -Infinity,
-      minY = Infinity,
-      maxY = -Infinity;
-    centers.forEach((c) => {
-      if (c.x < minX) minX = c.x;
-      if (c.x > maxX) maxX = c.x;
-      if (c.y < minY) minY = c.y;
-      if (c.y > maxY) maxY = c.y;
-    });
-    const targetCenterX = rect.x + rect.width / 2;
-    const targetCenterY = rect.y + rect.height / 2;
-    const currentCenterX = (minX + maxX) / 2;
-    const currentCenterY = (minY + maxY) / 2;
-    const dx = targetCenterX - currentCenterX;
-    const dy = targetCenterY - currentCenterY;
-    centers.forEach((c) => {
-      c.x += dx;
-      c.y += dy;
-    });
-    // filtra centros que possam sair do rect por borda numérica
-    return centers.filter(
-      (c) =>
-        c.x - r >= rect.x - 1e-6 &&
-        c.x + r <= rect.x + rect.width + 1e-6 &&
-        c.y - r >= rect.y - 1e-6 &&
-        c.y + r <= rect.y + rect.height + 1e-6,
-    );
+
+    // Opção B: colunas verticais, offset alternado em y
+    const centersB = [];
+    let col = 0;
+    for (let x = rect.x + r; x <= rect.x + rect.width - r + 1e-6; x += step, col++) {
+      const shift = col % 2 === 1 ? d / 2 : 0;
+      for (let y = rect.y + r + shift; y <= rect.y + rect.height - r + 1e-6; y += d) {
+        centersB.push({ x, y });
+      }
+    }
+
+    const filteredA = centerAndFilter(centersA);
+    const filteredB = centerAndFilter(centersB);
+    return filteredA.length >= filteredB.length ? filteredA : filteredB;
   }
 
   // Gerador retangular centrado na área (garante espaçamento vertical = spacingH, evita sobreposição de elipses altas)
