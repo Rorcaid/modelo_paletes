@@ -51,7 +51,7 @@
               </div>
             </div>
           </div>
-
+        </form>
 
         <!-- Action buttons container placed between the controls and footer
              so it can be vertically centered between the inputs (Diameter/...)
@@ -60,9 +60,6 @@
           <button type="button" onclick="fillPalActive()">Fill Pallet</button>
           <button id="exceedToggle" type="button" onclick="toggleExceed()">Exceeds Pallet</button>
           <button id="linearToggle" type="button" class="active" onclick="toggleLinearDisposition()">Linear Disposition</button>
-        </div>
-        <div id="sidebarFooter">
-          <button type="button" id="downloadImageBtn" onclick="downloadCanvas()">Download Image</button>
         </div>
       </aside>
 
@@ -77,6 +74,10 @@
             <div id="widthMeasure"></div>
             <div id="heightMeasure"></div>
           </div>
+        </div>
+
+        <div id="pageFooter">
+          <button type="button" id="downloadImageBtn" onclick="downloadCanvas()">Download Image</button>
         </div>
       </main>
     </div>

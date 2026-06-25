@@ -45,6 +45,21 @@ body {
   padding: 0 8px;
 }
 
+#pageFooter {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+#pageFooter button {
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: #fff8e6;
+  border: 1px solid #f1e0b8;
+  font-weight: 700;
+  font-size: 14px;
+}
+
 #canvasContainer {
   display: flex;
   justify-content: center;
@@ -199,21 +214,6 @@ select {
 #cylWidth,
 #cylHeight {
   text-align: center;
-}
-
-/* Sidebar footer where the download button sits */
-#sidebarFooter {
-  margin-top: auto;
-  padding: 12px 18px;
-}
-
-#sidebarFooter button {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #fff8e6;
-  border: 1px solid #f1e0b8;
-  font-weight: 700;
 }
 
 /* Botões simples */
