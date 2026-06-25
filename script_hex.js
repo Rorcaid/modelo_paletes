@@ -131,7 +131,48 @@ function fillPalHex() {
       x: c.x + rect.x, y: c.y + rect.y,
     }));
 
-    const candidates = [centersA, centersB, centersC, centersD]
+    // Opção E: filas iguais com espaçamento óptimo — encontra arranjos como 2+2
+    // onde o hex standard não cabe centrado mas um S ligeiramente maior cabe
+    function generateEqualRowsOptimal(W, H, swapped) {
+      const maxN = Math.floor(W / d);
+      let best = [];
+      for (let n = maxN; n >= 1; n--) {
+        // Bounding box das 2 filas (fila 0: n círculos; fila 1 offset: n círculos)
+        // x1 = W/2 - (2n-1)*S/4   (centra o bbox)
+        // Restrição altura: sqrt(d²-(S/2)²) ≤ H-2r  →  S ≥ 2*sqrt(d²-(H-2r)²)
+        const H_slack = H - 2 * r;
+        const S_min_h = H_slack >= d ? 0 : 2 * Math.sqrt(d * d - H_slack * H_slack);
+        const S_min = Math.max(d, S_min_h); // não pode sobrepor dentro da fila
+        // Restrição largura: x1 ≥ r  →  S ≤ 4*(W/2-r)/(2n-1)
+        const S_max = 4 * (W / 2 - r) / (2 * n - 1);
+        if (S_min > S_max + 1e-6) continue;
+
+        const S = S_min;
+        const x1 = W / 2 - (2 * n - 1) * S / 4;
+        const dy = Math.sqrt(Math.max(0, d * d - (S / 2) * (S / 2)));
+
+        const centers = [];
+        let y = r;
+        let parity = 0;
+        while (y + r <= H + 1e-6) {
+          const xOff = parity === 1 ? S / 2 : 0;
+          for (let i = 0; i < n; i++) {
+            centers.push(swapped
+              ? { x: y, y: x1 + xOff + i * S }
+              : { x: x1 + xOff + i * S, y });
+          }
+          y += dy > 1e-6 ? dy : H + 1; // evita loop infinito
+          parity = 1 - parity;
+        }
+        if (centers.length > best.length) best = centers;
+      }
+      return best.map(c => ({ x: c.x + rect.x, y: c.y + rect.y }));
+    }
+
+    const centersE = generateEqualRowsOptimal(rect.width, rect.height, false);
+    const centersF = generateEqualRowsOptimal(rect.height, rect.width, true);
+
+    const candidates = [centersA, centersB, centersC, centersD, centersE, centersF]
       .map(cs => centerAndFilter(cs.map(c => ({ x: c.x, y: c.y }))));
     return candidates.reduce((a, b) => a.length >= b.length ? a : b);
   }
