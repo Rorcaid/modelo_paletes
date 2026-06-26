@@ -1,1 +1,3 @@
 H - Hex - 300x267 deve aparecer 11bob
+
+V - Hex - 270 deve mostrar 12bob
