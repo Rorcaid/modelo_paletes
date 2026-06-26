@@ -387,30 +387,91 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
   if (mr >= Math.min(rx, ry) - 0.5) return;
 
   const scale = ctx.canvas.offsetWidth / ctx.canvas.width;
+  const rimT = Math.max(1.5, mr * 0.14);   // espessura da parede do mandril
+  const lw   = Math.max(0.4, 1 / scale);
+  const dashOn  = Math.max(1.5, 5 / scale);
+  const dashOff = Math.max(1,   2.5 / scale);
+
   ctx.save();
-  ctx.strokeStyle = 'rgba(30, 30, 30, 0.52)';
-  ctx.lineWidth = Math.max(0.4, 1 / scale);
-  ctx.setLineDash([Math.max(1.5, 5 / scale), Math.max(1, 2.5 / scale)]);
   ctx.lineCap = 'round';
 
   if (shapeType === 'circle') {
-    // Vista de cima: mandril aparece como círculo interior a tracejado
+    // ── Vista de cima (bobine vertical): mandril = anel + buraco ─────────
+    // 1. Anel da parede (rebordo) — cor de cartão/cardboard
+    ctx.beginPath();
+    ctx.arc(cx, cy, mr + rimT, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(148, 103, 52, 0.85)';
+    ctx.fill();
+
+    // 2. Buraco interior — igual ao fundo da palete (parece furo real)
     ctx.beginPath();
     ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFF0';
+    ctx.fill();
+
+    // 3. Contorno exterior do anel
+    ctx.beginPath();
+    ctx.arc(cx, cy, mr + rimT, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(85, 55, 18, 0.9)';
+    ctx.lineWidth = lw;
+    ctx.setLineDash([]);
     ctx.stroke();
-  } else if (!isRotated) {
-    // Cilindro em pé (eixo do mandril horizontal, ao longo de rx):
-    // duas linhas horizontais a ±mr, do extremo esquerdo ao direito da elipse
-    ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr); ctx.lineTo(cx + rx, cy - mr); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr); ctx.lineTo(cx + rx, cy + mr); ctx.stroke();
+
+    // 4. Contorno interior (borda do buraco)
+    ctx.beginPath();
+    ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(85, 55, 18, 0.65)';
+    ctx.lineWidth = lw * 0.8;
+    ctx.stroke();
+
   } else {
-    // Cilindro rodado 90° (eixo do mandril vertical, ao longo de ry):
-    // duas linhas verticais a ±mr, do topo ao fundo da elipse
-    ctx.beginPath(); ctx.moveTo(cx - mr, cy - ry); ctx.lineTo(cx - mr, cy + ry); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx + mr, cy - ry); ctx.lineTo(cx + mr, cy + ry); ctx.stroke();
+    // ── Vista lateral (bobine deitada): mandril = faixas + linhas ────────
+    // Clip à elipse para as faixas preenchidas não saírem da bobine
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.clip();
+
+    ctx.fillStyle = 'rgba(148, 103, 52, 0.52)';
+    if (!isRotated) {
+      // eixo do mandril horizontal → faixas acima e abaixo das linhas centrais
+      ctx.fillRect(cx - rx, cy - mr - rimT, rx * 2, rimT);
+      ctx.fillRect(cx - rx, cy + mr,        rx * 2, rimT);
+    } else {
+      // eixo do mandril vertical → faixas à esquerda e direita
+      ctx.fillRect(cx - mr - rimT, cy - ry, rimT, ry * 2);
+      ctx.fillRect(cx + mr,        cy - ry, rimT, ry * 2);
+    }
+    ctx.restore(); // remove clip
+
+    // Linhas interiores (tracejado) — bordo do buraco
+    ctx.strokeStyle = 'rgba(80, 52, 18, 0.78)';
+    ctx.lineWidth = lw;
+    ctx.setLineDash([dashOn, dashOff]);
+
+    if (!isRotated) {
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr); ctx.lineTo(cx + rx, cy - mr); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr); ctx.lineTo(cx + rx, cy + mr); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(cx - mr, cy - ry); ctx.lineTo(cx - mr, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + mr, cy - ry); ctx.lineTo(cx + mr, cy + ry); ctx.stroke();
+    }
+
+    // Linhas exteriores (sólido) — rebordo exterior do anel
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(85, 55, 18, 0.45)';
+    ctx.lineWidth = lw * 0.7;
+
+    if (!isRotated) {
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr - rimT); ctx.lineTo(cx + rx, cy - mr - rimT); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr + rimT); ctx.lineTo(cx + rx, cy + mr + rimT); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(cx - mr - rimT, cy - ry); ctx.lineTo(cx - mr - rimT, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + mr + rimT, cy - ry); ctx.lineTo(cx + mr + rimT, cy + ry); ctx.stroke();
+    }
+    ctx.setLineDash([]);
   }
 
-  ctx.setLineDash([]);
   ctx.restore();
 }
 
