@@ -115,6 +115,7 @@ function fillPal() {
         ctx.fillStyle = '#7FB3D5';
         ctx.fill();
         ctx.stroke();
+        drawMandril(ctx, x, y, getMandrilD(), 'circle', false, diameter / 2, diameter / 2);
         if (!firstMeasurementDrawn) {
           drawBobineMeasurements(ctx, x, y, diameter, diameter, 'circle');
           firstMeasurementDrawn = true;
@@ -173,6 +174,7 @@ function fillPal() {
         ctx.fillStyle = '#F5B041';
         ctx.fill();
         ctx.stroke();
+        drawMandril(ctx, x, y, getMandrilD(), 'cylinder', false, cylWidth / 2, cylHeight / 2);
         if (!firstMeasurementDrawn) {
           drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
           firstMeasurementDrawn = true;
@@ -196,8 +198,10 @@ function fillPal() {
         ctx.fillStyle = '#F8C471';
         ctx.fill();
         ctx.stroke();
+        drawMandril(ctx, x, y, getMandrilD(), 'cylinder', true, cylHeight / 2, cylWidth / 2);
         if (!firstMeasurementDrawn) {
-          drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
+          // visualmente: eixo horizontal = cylHeight, eixo vertical = cylWidth → trocar para label correcto
+          drawBobineMeasurements(ctx, x, y, cylHeight, cylWidth, 'cylinder');
           firstMeasurementDrawn = true;
         }
         count++;
@@ -364,6 +368,49 @@ function drawBobineMeasurements(
   ctx.rotate(-Math.PI / 2);
   ctx.fillText(heightLabel, 0, 0);
   ctx.restore();
+  ctx.restore();
+}
+
+// Retorna o diâmetro do mandril do input
+function getMandrilD() {
+  const el = document.getElementById('mandrilD');
+  return el ? (parseInt(el.value) || 0) : 0;
+}
+
+// Desenha o mandril (núcleo) de uma bobine no canvas
+// shapeType: 'circle' ou 'cylinder'
+// isRotated: true quando a bobine está rodada 90° (elipse com eixo longo vertical)
+// rx, ry: semi-eixos da elipse/círculo conforme desenhados no canvas
+function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
+  if (!mandrilD || mandrilD <= 0) return;
+  const mr = mandrilD / 2;
+  if (mr >= Math.min(rx, ry) - 0.5) return;
+
+  const scale = ctx.canvas.offsetWidth / ctx.canvas.width;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(30, 30, 30, 0.52)';
+  ctx.lineWidth = Math.max(0.4, 1 / scale);
+  ctx.setLineDash([Math.max(1.5, 5 / scale), Math.max(1, 2.5 / scale)]);
+  ctx.lineCap = 'round';
+
+  if (shapeType === 'circle') {
+    // Vista de cima: mandril aparece como círculo interior a tracejado
+    ctx.beginPath();
+    ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+    ctx.stroke();
+  } else if (!isRotated) {
+    // Cilindro em pé (eixo do mandril horizontal, ao longo de rx):
+    // duas linhas horizontais a ±mr, do extremo esquerdo ao direito da elipse
+    ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr); ctx.lineTo(cx + rx, cy - mr); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr); ctx.lineTo(cx + rx, cy + mr); ctx.stroke();
+  } else {
+    // Cilindro rodado 90° (eixo do mandril vertical, ao longo de ry):
+    // duas linhas verticais a ±mr, do topo ao fundo da elipse
+    ctx.beginPath(); ctx.moveTo(cx - mr, cy - ry); ctx.lineTo(cx - mr, cy + ry); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + mr, cy - ry); ctx.lineTo(cx + mr, cy + ry); ctx.stroke();
+  }
+
+  ctx.setLineDash([]);
   ctx.restore();
 }
 

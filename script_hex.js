@@ -251,6 +251,7 @@ function fillPalHex() {
       ctx.fillStyle = '#7FB3D5';
       ctx.fill();
       ctx.stroke();
+      drawMandril(ctx, c.x, c.y, getMandrilD(), 'circle', false, r, r);
       if (!firstMeasurementDrawn) {
         drawBobineMeasurements(ctx, c.x, c.y, diameter, diameter, 'circle');
         firstMeasurementDrawn = true;
@@ -410,6 +411,7 @@ function fillPalHex() {
       ctx.fillStyle = '#F5B041';
       ctx.fill();
       ctx.stroke();
+      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', false, cylWidth / 2, cylHeight / 2);
       if (!firstMeasurementDrawn) {
         drawBobineMeasurements(ctx, c.x, c.y, cylWidth, cylHeight, 'cylinder');
         firstMeasurementDrawn = true;
@@ -423,8 +425,10 @@ function fillPalHex() {
       ctx.fillStyle = '#F8C471';
       ctx.fill();
       ctx.stroke();
+      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', true, cylHeight / 2, cylWidth / 2);
       if (!firstMeasurementDrawn) {
-        drawBobineMeasurements(ctx, c.x, c.y, cylWidth, cylHeight, 'cylinder');
+        // visualmente: eixo horizontal = cylHeight, eixo vertical = cylWidth → trocar para label correcto
+        drawBobineMeasurements(ctx, c.x, c.y, cylHeight, cylWidth, 'cylinder');
         firstMeasurementDrawn = true;
       }
       count++;
