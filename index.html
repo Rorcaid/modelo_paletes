@@ -57,7 +57,7 @@
 
           <div class="form-row">
             <label for="mandrilD">Mandril Ø (mm)</label>
-            <select id="mandrilD">
+            <select id="mandrilD" onchange="if(parseInt(document.getElementById('bobCount').textContent)||0) fillPalActive()">
               <option value="76">76 mm</option>
               <option value="152">152 mm</option>
             </select>
