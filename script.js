@@ -386,8 +386,14 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
   const mr = mandrilD / 2;
   if (mr >= Math.min(rx, ry) - 0.5) return;
 
+  // raio de referência da bobine (menor semi-eixo = semi-diâmetro)
+  const reelR = Math.min(rx, ry);
+  // raio visual: usa o físico mas garante mínimo de 15% do raio da bobine,
+  // preservando o rácio 2:1 entre os dois tamanhos (76 vs 152 mm)
+  const visualMr = Math.max(mr, reelR * 0.15);
+
   const scale = ctx.canvas.offsetWidth / ctx.canvas.width;
-  const rimT = Math.max(1.5, mr * 0.14);   // espessura da parede do mandril
+  const rimT = Math.max(visualMr * 0.18, reelR * 0.035); // espessura da parede do mandril
   const lw   = Math.max(0.4, 1 / scale);
   const dashOn  = Math.max(1.5, 5 / scale);
   const dashOff = Math.max(1,   2.5 / scale);
@@ -399,19 +405,19 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     // ── Vista de cima (bobine vertical): mandril = anel + buraco ─────────
     // 1. Anel da parede (rebordo) — cor de cartão/cardboard
     ctx.beginPath();
-    ctx.arc(cx, cy, mr + rimT, 0, Math.PI * 2);
+    ctx.arc(cx, cy, visualMr + rimT, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(148, 103, 52, 0.85)';
     ctx.fill();
 
     // 2. Buraco interior — igual ao fundo da palete (parece furo real)
     ctx.beginPath();
-    ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+    ctx.arc(cx, cy, visualMr, 0, Math.PI * 2);
     ctx.fillStyle = '#FFFFF0';
     ctx.fill();
 
     // 3. Contorno exterior do anel
     ctx.beginPath();
-    ctx.arc(cx, cy, mr + rimT, 0, Math.PI * 2);
+    ctx.arc(cx, cy, visualMr + rimT, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(85, 55, 18, 0.9)';
     ctx.lineWidth = lw;
     ctx.setLineDash([]);
@@ -419,7 +425,7 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
 
     // 4. Contorno interior (borda do buraco)
     ctx.beginPath();
-    ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+    ctx.arc(cx, cy, visualMr, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(85, 55, 18, 0.65)';
     ctx.lineWidth = lw * 0.8;
     ctx.stroke();
@@ -434,13 +440,11 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
 
     ctx.fillStyle = 'rgba(148, 103, 52, 0.52)';
     if (!isRotated) {
-      // eixo do mandril horizontal → faixas acima e abaixo das linhas centrais
-      ctx.fillRect(cx - rx, cy - mr - rimT, rx * 2, rimT);
-      ctx.fillRect(cx - rx, cy + mr,        rx * 2, rimT);
+      ctx.fillRect(cx - rx, cy - visualMr - rimT, rx * 2, rimT);
+      ctx.fillRect(cx - rx, cy + visualMr,        rx * 2, rimT);
     } else {
-      // eixo do mandril vertical → faixas à esquerda e direita
-      ctx.fillRect(cx - mr - rimT, cy - ry, rimT, ry * 2);
-      ctx.fillRect(cx + mr,        cy - ry, rimT, ry * 2);
+      ctx.fillRect(cx - visualMr - rimT, cy - ry, rimT, ry * 2);
+      ctx.fillRect(cx + visualMr,        cy - ry, rimT, ry * 2);
     }
     ctx.restore(); // remove clip
 
@@ -450,11 +454,11 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     ctx.setLineDash([dashOn, dashOff]);
 
     if (!isRotated) {
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr); ctx.lineTo(cx + rx, cy - mr); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr); ctx.lineTo(cx + rx, cy + mr); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy - visualMr); ctx.lineTo(cx + rx, cy - visualMr); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy + visualMr); ctx.lineTo(cx + rx, cy + visualMr); ctx.stroke();
     } else {
-      ctx.beginPath(); ctx.moveTo(cx - mr, cy - ry); ctx.lineTo(cx - mr, cy + ry); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx + mr, cy - ry); ctx.lineTo(cx + mr, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - visualMr, cy - ry); ctx.lineTo(cx - visualMr, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + visualMr, cy - ry); ctx.lineTo(cx + visualMr, cy + ry); ctx.stroke();
     }
 
     // Linhas exteriores (sólido) — rebordo exterior do anel
@@ -463,11 +467,11 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     ctx.lineWidth = lw * 0.7;
 
     if (!isRotated) {
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy - mr - rimT); ctx.lineTo(cx + rx, cy - mr - rimT); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy + mr + rimT); ctx.lineTo(cx + rx, cy + mr + rimT); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy - visualMr - rimT); ctx.lineTo(cx + rx, cy - visualMr - rimT); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - rx, cy + visualMr + rimT); ctx.lineTo(cx + rx, cy + visualMr + rimT); ctx.stroke();
     } else {
-      ctx.beginPath(); ctx.moveTo(cx - mr - rimT, cy - ry); ctx.lineTo(cx - mr - rimT, cy + ry); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx + mr + rimT, cy - ry); ctx.lineTo(cx + mr + rimT, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - visualMr - rimT, cy - ry); ctx.lineTo(cx - visualMr - rimT, cy + ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + visualMr + rimT, cy - ry); ctx.lineTo(cx + visualMr + rimT, cy + ry); ctx.stroke();
     }
     ctx.setLineDash([]);
   }
