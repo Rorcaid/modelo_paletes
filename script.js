@@ -170,7 +170,7 @@ function fillPal() {
         const x = offsetX + col * spacingW + spacingW / 2;
         const y = offsetY + row * spacingH + spacingH / 2;
         ctx.beginPath();
-        ctx.ellipse(x, y, cylWidth / 2, cylHeight / 2, 0, 0, Math.PI * 2);
+        cylRoundedPath(ctx, x, y, cylWidth, cylHeight);
         ctx.fillStyle = '#F5B041';
         ctx.fill();
         ctx.stroke();
@@ -194,7 +194,7 @@ function fillPal() {
         const x = offsetXRot + col * spacingRotW + spacingRotW / 2;
         const y = offsetYRot + row * spacingRotH + spacingRotH / 2;
         ctx.beginPath();
-        ctx.ellipse(x, y, cylHeight / 2, cylWidth / 2, 0, 0, Math.PI * 2);
+        cylRoundedPath(ctx, x, y, cylHeight, cylWidth);
         ctx.fillStyle = '#F8C471';
         ctx.fill();
         ctx.stroke();
@@ -371,6 +371,13 @@ function drawBobineMeasurements(
   ctx.restore();
 }
 
+// Helper: path de rectângulo com cantos arredondados centrado em (cx, cy)
+// O raio dos cantos é 25% da menor dimensão
+function cylRoundedPath(ctx, cx, cy, w, h) {
+  const r = Math.min(w, h) * 0.25;
+  ctx.roundRect(cx - w / 2, cy - h / 2, w, h, r);
+}
+
 // Retorna o diâmetro do mandril do input
 function getMandrilD() {
   const el = document.getElementById('mandrilD');
@@ -435,7 +442,7 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     // Clip à elipse para as faixas preenchidas não saírem da bobine
     ctx.save();
     ctx.beginPath();
-    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.roundRect(cx - rx, cy - ry, 2 * rx, 2 * ry, Math.min(2 * rx, 2 * ry) * 0.25);
     ctx.clip();
 
     ctx.fillStyle = 'rgba(148, 103, 52, 0.52)';

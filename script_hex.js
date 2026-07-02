@@ -407,7 +407,7 @@ function fillPalHex() {
     // desenha elipses upright (centros calculados)
     centersUpright.forEach((c) => {
       ctx.beginPath();
-      ctx.ellipse(c.x, c.y, cylWidth / 2, cylHeight / 2, 0, 0, Math.PI * 2);
+      cylRoundedPath(ctx, c.x, c.y, cylWidth, cylHeight);
       ctx.fillStyle = '#F5B041';
       ctx.fill();
       ctx.stroke();
@@ -421,7 +421,7 @@ function fillPalHex() {
 
     centersRot.forEach((c) => {
       ctx.beginPath();
-      ctx.ellipse(c.x, c.y, cylHeight / 2, cylWidth / 2, 0, 0, Math.PI * 2);
+      cylRoundedPath(ctx, c.x, c.y, cylHeight, cylWidth);
       ctx.fillStyle = '#F8C471';
       ctx.fill();
       ctx.stroke();
