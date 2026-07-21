@@ -372,9 +372,9 @@ function drawBobineMeasurements(
 }
 
 // Helper: path de rectângulo com cantos arredondados centrado em (cx, cy)
-// O raio dos cantos é 25% da menor dimensão
+// O raio dos cantos é 8% da menor dimensão (aspecto rectangular bem definido)
 function cylRoundedPath(ctx, cx, cy, w, h) {
-  const r = Math.min(w, h) * 0.25;
+  const r = Math.min(w, h) * 0.08;
   ctx.roundRect(cx - w / 2, cy - h / 2, w, h, r);
 }
 
@@ -442,7 +442,7 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     // Clip à elipse para as faixas preenchidas não saírem da bobine
     ctx.save();
     ctx.beginPath();
-    ctx.roundRect(cx - rx, cy - ry, 2 * rx, 2 * ry, Math.min(2 * rx, 2 * ry) * 0.25);
+    ctx.roundRect(cx - rx, cy - ry, 2 * rx, 2 * ry, Math.min(2 * rx, 2 * ry) * 0.08);
     ctx.clip();
 
     ctx.fillStyle = 'rgba(148, 103, 52, 0.52)';
