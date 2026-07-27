@@ -57,7 +57,15 @@
 
           <div class="form-row">
             <label for="mandrilD">Mandril Ø (mm)</label>
-            <select id="mandrilD" onchange="if(parseInt(document.getElementById('bobCount').textContent)||0) fillPalActive()">
+            <select
+              id="mandrilD"
+              onchange="
+                if (
+                  parseInt(document.getElementById('bobCount').textContent) ||
+                  0
+                )
+                  fillPalActive();
+              ">
               <option value="76">76 mm</option>
               <option value="152">152 mm</option>
             </select>
@@ -66,10 +74,23 @@
 
         <div id="controlButtons">
           <button type="button" onclick="fillPalActive()">Fill Pallet</button>
-          <button id="exceedToggle" type="button" onclick="toggleExceed()">Exceeds Pallet</button>
-          <button id="linearToggle" type="button" class="active" onclick="toggleLinearDisposition()">Linear Disposition</button>
+          <button id="exceedToggle" type="button" onclick="toggleExceed()">
+            Exceeds Pallet
+          </button>
+          <button
+            id="linearToggle"
+            type="button"
+            class="active"
+            onclick="toggleLinearDisposition()">
+            Linear Disposition
+          </button>
           <div id="sidebarFooter">
-            <button type="button" id="downloadImageBtn" onclick="downloadCanvas()">Download Image</button>
+            <button
+              type="button"
+              id="downloadImageBtn"
+              onclick="downloadCanvas()">
+              Download Image
+            </button>
           </div>
         </div>
       </aside>
@@ -89,8 +110,8 @@
       </main>
     </div>
 
-    <script src="script.js"></script>
-    <script src="script_hex.js"></script>
+    <script type="module" src="./script.js"></script>
+    <script type="module" src="./script_hex.js"></script>
     <script>
       // estado global: true = usar linear (script.js), false = usar hex (script_hex.js)
       window.linearDisposition = true;
@@ -127,14 +148,16 @@
 
       document.addEventListener('DOMContentLoaded', function () {
         // submete ao pressionar Enter em qualquer input numérico
-        document.querySelectorAll('input[type="number"]').forEach(function (input) {
-          input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              fillPalActive();
-            }
+        document
+          .querySelectorAll('input[type="number"]')
+          .forEach(function (input) {
+            input.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                fillPalActive();
+              }
+            });
           });
-        });
 
         // reposiciona as medidas da palete sempre que o canvas muda de tamanho visual
         const canvas = document.getElementById('palCanvas');

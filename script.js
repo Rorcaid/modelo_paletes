@@ -115,7 +115,16 @@ function fillPal() {
         ctx.fillStyle = '#7FB3D5';
         ctx.fill();
         ctx.stroke();
-        drawMandril(ctx, x, y, getMandrilD(), 'circle', false, diameter / 2, diameter / 2);
+        drawMandril(
+          ctx,
+          x,
+          y,
+          getMandrilD(),
+          'circle',
+          false,
+          diameter / 2,
+          diameter / 2,
+        );
         if (!firstMeasurementDrawn) {
           drawBobineMeasurements(ctx, x, y, diameter, diameter, 'circle');
           firstMeasurementDrawn = true;
@@ -174,7 +183,16 @@ function fillPal() {
         ctx.fillStyle = '#F5B041';
         ctx.fill();
         ctx.stroke();
-        drawMandril(ctx, x, y, getMandrilD(), 'cylinder', false, cylWidth / 2, cylHeight / 2);
+        drawMandril(
+          ctx,
+          x,
+          y,
+          getMandrilD(),
+          'cylinder',
+          false,
+          cylWidth / 2,
+          cylHeight / 2,
+        );
         if (!firstMeasurementDrawn) {
           drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
           firstMeasurementDrawn = true;
@@ -198,7 +216,16 @@ function fillPal() {
         ctx.fillStyle = '#F8C471';
         ctx.fill();
         ctx.stroke();
-        drawMandril(ctx, x, y, getMandrilD(), 'cylinder', true, cylHeight / 2, cylWidth / 2);
+        drawMandril(
+          ctx,
+          x,
+          y,
+          getMandrilD(),
+          'cylinder',
+          true,
+          cylHeight / 2,
+          cylWidth / 2,
+        );
         if (!firstMeasurementDrawn) {
           // visualmente: eixo horizontal = cylHeight, eixo vertical = cylWidth → trocar para label correcto
           drawBobineMeasurements(ctx, x, y, cylHeight, cylWidth, 'cylinder');
@@ -381,7 +408,7 @@ function cylRoundedPath(ctx, cx, cy, w, h) {
 // Retorna o diâmetro do mandril do input
 function getMandrilD() {
   const el = document.getElementById('mandrilD');
-  return el ? (parseInt(el.value) || 0) : 0;
+  return el ? parseInt(el.value) || 0 : 0;
 }
 
 // Desenha o mandril (núcleo) de uma bobine no canvas
@@ -401,9 +428,9 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
 
   const scale = ctx.canvas.offsetWidth / ctx.canvas.width;
   const rimT = Math.max(visualMr * 0.18, reelR * 0.035); // espessura da parede do mandril
-  const lw   = Math.max(0.4, 1 / scale);
-  const dashOn  = Math.max(1.5, 5 / scale);
-  const dashOff = Math.max(1,   2.5 / scale);
+  const lw = Math.max(0.4, 1 / scale);
+  const dashOn = Math.max(1.5, 5 / scale);
+  const dashOff = Math.max(1, 2.5 / scale);
 
   ctx.save();
   ctx.lineCap = 'round';
@@ -436,22 +463,27 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     ctx.strokeStyle = 'rgba(85, 55, 18, 0.65)';
     ctx.lineWidth = lw * 0.8;
     ctx.stroke();
-
   } else {
     // ── Vista lateral (bobine deitada): mandril = faixas + linhas ────────
     // Clip à elipse para as faixas preenchidas não saírem da bobine
     ctx.save();
     ctx.beginPath();
-    ctx.roundRect(cx - rx, cy - ry, 2 * rx, 2 * ry, Math.min(2 * rx, 2 * ry) * 0.08);
+    ctx.roundRect(
+      cx - rx,
+      cy - ry,
+      2 * rx,
+      2 * ry,
+      Math.min(2 * rx, 2 * ry) * 0.08,
+    );
     ctx.clip();
 
     ctx.fillStyle = 'rgba(148, 103, 52, 0.52)';
     if (!isRotated) {
       ctx.fillRect(cx - rx, cy - visualMr - rimT, rx * 2, rimT);
-      ctx.fillRect(cx - rx, cy + visualMr,        rx * 2, rimT);
+      ctx.fillRect(cx - rx, cy + visualMr, rx * 2, rimT);
     } else {
       ctx.fillRect(cx - visualMr - rimT, cy - ry, rimT, ry * 2);
-      ctx.fillRect(cx + visualMr,        cy - ry, rimT, ry * 2);
+      ctx.fillRect(cx + visualMr, cy - ry, rimT, ry * 2);
     }
     ctx.restore(); // remove clip
 
@@ -461,11 +493,23 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     ctx.setLineDash([dashOn, dashOff]);
 
     if (!isRotated) {
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy - visualMr); ctx.lineTo(cx + rx, cy - visualMr); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy + visualMr); ctx.lineTo(cx + rx, cy + visualMr); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - rx, cy - visualMr);
+      ctx.lineTo(cx + rx, cy - visualMr);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - rx, cy + visualMr);
+      ctx.lineTo(cx + rx, cy + visualMr);
+      ctx.stroke();
     } else {
-      ctx.beginPath(); ctx.moveTo(cx - visualMr, cy - ry); ctx.lineTo(cx - visualMr, cy + ry); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx + visualMr, cy - ry); ctx.lineTo(cx + visualMr, cy + ry); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - visualMr, cy - ry);
+      ctx.lineTo(cx - visualMr, cy + ry);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + visualMr, cy - ry);
+      ctx.lineTo(cx + visualMr, cy + ry);
+      ctx.stroke();
     }
 
     // Linhas exteriores (sólido) — rebordo exterior do anel
@@ -474,11 +518,23 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
     ctx.lineWidth = lw * 0.7;
 
     if (!isRotated) {
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy - visualMr - rimT); ctx.lineTo(cx + rx, cy - visualMr - rimT); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx - rx, cy + visualMr + rimT); ctx.lineTo(cx + rx, cy + visualMr + rimT); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - rx, cy - visualMr - rimT);
+      ctx.lineTo(cx + rx, cy - visualMr - rimT);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - rx, cy + visualMr + rimT);
+      ctx.lineTo(cx + rx, cy + visualMr + rimT);
+      ctx.stroke();
     } else {
-      ctx.beginPath(); ctx.moveTo(cx - visualMr - rimT, cy - ry); ctx.lineTo(cx - visualMr - rimT, cy + ry); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx + visualMr + rimT, cy - ry); ctx.lineTo(cx + visualMr + rimT, cy + ry); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - visualMr - rimT, cy - ry);
+      ctx.lineTo(cx - visualMr - rimT, cy + ry);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + visualMr + rimT, cy - ry);
+      ctx.lineTo(cx + visualMr + rimT, cy + ry);
+      ctx.stroke();
     }
     ctx.setLineDash([]);
   }
@@ -502,3 +558,15 @@ window.onload = function () {
   toggleCylinderInputs();
   // ...existing code... (se houver mais inicializações)
 };
+
+window.updateCanvasSize = updateCanvasSize;
+window.autosizeCanvas = autosizeCanvas;
+window.toggleCylinderInputs = toggleCylinderInputs;
+window.calculateAdjustedOffset = calculateAdjustedOffset;
+window.fillPal = fillPal;
+window.drawPaletMeasurements = drawPaletMeasurements;
+window.drawBobineMeasurements = drawBobineMeasurements;
+window.cylRoundedPath = cylRoundedPath;
+window.getMandrilD = getMandrilD;
+window.drawMandril = drawMandril;
+window.downloadCanvas = downloadCanvas;
