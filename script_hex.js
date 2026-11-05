@@ -4,31 +4,43 @@
 function calculateSevenCircleLayout(canvasWidth, canvasHeight, diameter, allowExceed) {
   if (allowExceed) return null;
 
-  // Compact staggered arrangement, expressed in reel-diameter units.
-  const layout = [
-    [0, 0],
-    [1.8110656393, 0],
-    [0, 1.0218864011],
-    [1.9137186521, 1.3414698171],
-    [2.6018504137, 0.6121106442],
-    [0.9171401577, 1.4242424242],
-    [0.9055328197, 0.424299791],
+  const radius = diameter / 2;
+  const centers = [
+    { x: radius, y: radius },
+    { x: radius * 3, y: radius },
+    { x: canvasWidth - radius, y: radius },
+    { x: canvasWidth * 0.625, y: canvasHeight / 2 },
+    { x: radius, y: canvasHeight - radius },
+    { x: radius * 3, y: canvasHeight - radius },
+    { x: canvasWidth - radius, y: canvasHeight - radius },
   ];
-  const layoutWidth = Math.max(...layout.map(([x]) => x)) + 1;
-  const layoutHeight = Math.max(...layout.map(([, y]) => y)) + 1;
+
   if (
-    diameter * layoutWidth > canvasWidth ||
-    diameter * layoutHeight > canvasHeight
+    centers.some(
+      ({ x, y }) =>
+        x < radius ||
+        x > canvasWidth - radius ||
+        y < radius ||
+        y > canvasHeight - radius,
+    )
   ) {
     return null;
   }
 
-  const offsetX = (canvasWidth - diameter * layoutWidth) / 2;
-  const offsetY = (canvasHeight - diameter * layoutHeight) / 2;
-  return layout.map(([x, y]) => ({
-    x: offsetX + diameter * (0.5 + x),
-    y: offsetY + diameter * (0.5 + y),
-  }));
+  for (let i = 0; i < centers.length; i++) {
+    for (let j = i + 1; j < centers.length; j++) {
+      if (
+        Math.hypot(
+          centers[i].x - centers[j].x,
+          centers[i].y - centers[j].y,
+        ) < diameter - 1e-6
+      ) {
+        return null;
+      }
+    }
+  }
+
+  return centers;
 }
 
 function fillPalHex() {
