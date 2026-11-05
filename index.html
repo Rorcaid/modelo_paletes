@@ -34,7 +34,9 @@
 
           <div class="form-row">
             <label for="shape">Reel Orientation</label>
-            <select id="shape" onchange="toggleCylinderInputs()">
+            <select
+              id="shape"
+              onchange="toggleCylinderInputs(); fillPalActive()">
               <option value="circle">Vertical (standing)</option>
               <option value="cylinder">Horizontal (lying)</option>
             </select>
