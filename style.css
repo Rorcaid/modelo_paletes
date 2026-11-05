@@ -131,6 +131,11 @@ input[type='number']::placeholder {
   flex-direction: column;
   gap: 6px;
   width: 100%;
+  min-height: 122px;
+}
+
+#circleInputs > input {
+  flex: 0 0 auto;
 }
 
 #cylinderInputs {

@@ -407,10 +407,9 @@ function cylRoundedPath(ctx, cx, cy, w, h) {
   ctx.roundRect(cx - w / 2, cy - h / 2, w, h, r);
 }
 
-// Retorna o diâmetro do mandril do input
+// Retorna o diâmetro fixo do mandril.
 function getMandrilD() {
-  const el = document.getElementById('mandrilD');
-  return el ? parseInt(el.value) || 0 : 0;
+  return 76;
 }
 
 // Desenha o mandril (núcleo) de uma bobine no canvas
@@ -424,8 +423,7 @@ function drawMandril(ctx, cx, cy, mandrilD, shapeType, isRotated, rx, ry) {
 
   // raio de referência da bobine (menor semi-eixo = semi-diâmetro)
   const reelR = Math.min(rx, ry);
-  // raio visual: usa o físico mas garante mínimo de 15% do raio da bobine,
-  // preservando o rácio 2:1 entre os dois tamanhos (76 vs 152 mm)
+  // raio visual: usa o físico mas garante mínimo de 15% do raio da bobine.
   const visualMr = Math.max(mr, reelR * 0.15);
 
   const scale = ctx.canvas.offsetWidth / ctx.canvas.width;
