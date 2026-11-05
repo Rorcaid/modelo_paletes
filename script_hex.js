@@ -317,11 +317,13 @@ function fillPalHex() {
     const spacingRotW = cylHeight;
     const spacingRotH = cylWidth;
     const remainingHeight = canvas.height - rowsUpright * spacingH;
-    const { count: rowsRotated } = calculateAdjustedOffset(
+    const { count: calculatedRowsRotated } = calculateAdjustedOffset(
       remainingHeight,
       spacingRotH,
       allowExceed,
     );
+    const rowsRotated =
+      window.linearDisposition === false ? calculatedRowsRotated : 0;
     const { count: colsRotated, offset: offsetXRot } = calculateAdjustedOffset(
       canvas.width,
       spacingRotW,

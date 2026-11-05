@@ -158,11 +158,13 @@ function fillPal() {
     const spacingRotH = cylWidth;
     // área restante abaixo das upright e quantas linhas/colunas rotacionadas cabem
     const remainingHeight = canvas.height - rowsUpright * spacingH;
-    const { count: rowsRotated } = calculateAdjustedOffset(
+    const { count: calculatedRowsRotated } = calculateAdjustedOffset(
       remainingHeight,
       spacingRotH,
       allowExceed,
     );
+    const rowsRotated =
+      window.linearDisposition === false ? calculatedRowsRotated : 0;
     const { count: colsRotated, offset: offsetXRot } = calculateAdjustedOffset(
       canvas.width,
       spacingRotW,
