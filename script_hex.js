@@ -305,6 +305,10 @@ function fillPalHex() {
 
     // mantenho a mesma lógica do original para contar/cortar áreas:
     const rotateReels = window.rotateReels === true;
+    if (rotateReels && typeof fillPal === 'function') {
+      return fillPal();
+    }
+
     const uprightWidth = rotateReels ? cylHeight : cylWidth;
     const uprightHeight = rotateReels ? cylWidth : cylHeight;
     const rotatedWidth = rotateReels ? cylWidth : cylHeight;
