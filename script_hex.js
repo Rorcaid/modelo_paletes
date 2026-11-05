@@ -43,6 +43,109 @@ function calculateSevenCircleLayout(canvasWidth, canvasHeight, diameter, allowEx
   return centers;
 }
 
+function calculateNineCircleLayout(canvasWidth, canvasHeight, diameter, allowExceed) {
+  if (allowExceed) return null;
+
+  const layout = [
+    [0.5, 0],
+    [1.64, 0],
+    [2.84, 0],
+    [1.06, 1],
+    [2.26, 1],
+    [3.45, 1],
+    [0.5, 2],
+    [1.64, 2],
+    [2.84, 2],
+  ];
+  const radius = diameter / 2;
+  const rowY = [radius, canvasHeight / 2, canvasHeight - radius];
+  const centers = layout.map(([x, row]) => ({
+    x: x * diameter,
+    y: rowY[row],
+  }));
+
+  if (
+    centers.some(
+      ({ x, y }) =>
+        x < radius ||
+        x > canvasWidth - radius ||
+        y < radius ||
+        y > canvasHeight - radius,
+    )
+  ) {
+    return null;
+  }
+
+  for (let i = 0; i < centers.length; i++) {
+    for (let j = i + 1; j < centers.length; j++) {
+      if (
+        Math.hypot(
+          centers[i].x - centers[j].x,
+          centers[i].y - centers[j].y,
+        ) < diameter - 1e-6
+      ) {
+        return null;
+      }
+    }
+  }
+
+  return centers;
+}
+
+function calculateTwelveCircleLayout(
+  canvasWidth,
+  canvasHeight,
+  diameter,
+  allowExceed,
+) {
+  if (allowExceed) return null;
+
+  const verticalStep = Math.min(diameter, (canvasHeight - diameter) / 2);
+  if (verticalStep <= 0) return null;
+  const horizontalShift = Math.sqrt(
+    Math.max(0, diameter * diameter - verticalStep * verticalStep),
+  );
+  const horizontalSlack = canvasWidth - diameter * 4;
+  if (horizontalShift > horizontalSlack + 1e-6) return null;
+
+  const firstCenterX = (canvasWidth - diameter * 3) / 2;
+  const firstCenterY = (canvasHeight - verticalStep * 2) / 2;
+  const rowShifts = [-horizontalShift / 2, horizontalShift / 2, -horizontalShift / 2];
+  const centers = [];
+
+  for (let row = 0; row < rowShifts.length; row++) {
+    for (let col = 0; col < 4; col++) {
+      centers.push({
+        x: firstCenterX + col * diameter + rowShifts[row],
+        y: firstCenterY + row * verticalStep,
+      });
+    }
+  }
+
+  const radius = diameter / 2;
+  for (let i = 0; i < centers.length; i++) {
+    const { x, y } = centers[i];
+    if (
+      x < radius - 1e-6 ||
+      x > canvasWidth - radius + 1e-6 ||
+      y < radius - 1e-6 ||
+      y > canvasHeight - radius + 1e-6
+    ) {
+      return null;
+    }
+    for (let j = i + 1; j < centers.length; j++) {
+      if (
+        Math.hypot(x - centers[j].x, y - centers[j].y) <
+        diameter - 1e-6
+      ) {
+        return null;
+      }
+    }
+  }
+
+  return centers;
+}
+
 function fillPalHex() {
   const canvas = document.getElementById('palCanvas');
   const ctx = canvas.getContext('2d');
@@ -294,6 +397,24 @@ function fillPalHex() {
     );
     if (sevenCircleCenters && centers.length < sevenCircleCenters.length) {
       centers = sevenCircleCenters;
+    }
+    const nineCircleCenters = calculateNineCircleLayout(
+      canvas.width,
+      canvas.height,
+      d,
+      allowExceed,
+    );
+    if (nineCircleCenters && centers.length < nineCircleCenters.length) {
+      centers = nineCircleCenters;
+    }
+    const twelveCircleCenters = calculateTwelveCircleLayout(
+      canvas.width,
+      canvas.height,
+      d,
+      allowExceed,
+    );
+    if (twelveCircleCenters && centers.length < twelveCircleCenters.length) {
+      centers = twelveCircleCenters;
     }
     const r = d / 2;
     centers.forEach((c) => {
