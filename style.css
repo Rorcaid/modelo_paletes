@@ -239,6 +239,14 @@ button.active {
   border-color: rgba(99,179,237,0.35);
 }
 
+#exceedToggle.active,
+#linearToggle.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+}
+
 /* ── Sidebar footer (download) ── */
 #sidebarFooter {
   margin-top: auto;

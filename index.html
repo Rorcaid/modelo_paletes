@@ -80,9 +80,8 @@
           <button
             id="linearToggle"
             type="button"
-            class="active"
             onclick="toggleLinearDisposition()">
-            Linear Disposition
+            Adjust Disposition
           </button>
           <div id="sidebarFooter">
             <button
@@ -120,11 +119,9 @@
         window.linearDisposition = !window.linearDisposition;
         const btn = document.getElementById('linearToggle');
         if (window.linearDisposition) {
-          btn.classList.add('active');
-          btn.textContent = 'Linear Disposition';
-        } else {
           btn.classList.remove('active');
-          btn.textContent = 'Hexagonal Disposition';
+        } else {
+          btn.classList.add('active');
         }
         // redesenha imediatamente usando o modo activo (mantém os inputs)
         fillPalActive();
@@ -137,10 +134,8 @@
         hidden.checked = !hidden.checked;
         if (hidden.checked) {
           btn.classList.add('active');
-          btn.textContent = 'Exceeds Pallet ✓';
         } else {
           btn.classList.remove('active');
-          btn.textContent = 'Exceeds Pallet';
         }
         // redesenha com o novo estado
         fillPalActive();
