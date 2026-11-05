@@ -304,8 +304,13 @@ function fillPalHex() {
       return alert('Dimensões inválidas.');
 
     // mantenho a mesma lógica do original para contar/cortar áreas:
-    const spacingW = cylWidth;
-    const spacingH = cylHeight;
+    const rotateReels = window.rotateReels === true;
+    const uprightWidth = rotateReels ? cylHeight : cylWidth;
+    const uprightHeight = rotateReels ? cylWidth : cylHeight;
+    const rotatedWidth = rotateReels ? cylWidth : cylHeight;
+    const rotatedHeight = rotateReels ? cylHeight : cylWidth;
+    const spacingW = uprightWidth;
+    const spacingH = uprightHeight;
     const { count: colsUpright, offset: offsetX } = calculateAdjustedOffset(
       canvas.width,
       spacingW,
@@ -314,8 +319,8 @@ function fillPalHex() {
     const { count: rowsUpright, offset: offsetYCentered } =
       calculateAdjustedOffset(canvas.height, spacingH, allowExceed);
 
-    const spacingRotW = cylHeight;
-    const spacingRotH = cylWidth;
+    const spacingRotW = rotatedWidth;
+    const spacingRotH = rotatedHeight;
     const remainingHeight = canvas.height - rowsUpright * spacingH;
     const { count: calculatedRowsRotated } = calculateAdjustedOffset(
       remainingHeight,
@@ -349,7 +354,7 @@ function fillPalHex() {
     // reorganiza em linhas retangulares distribuindo 'desiredN' entre as linhas (ex.: 4 acima, 3 abaixo).
     const hexVStepForUpright = (Math.sqrt(3) / 2) * spacingW; // 0.866 * spacingW
     let centersUpright = [];
-    if (cylHeight > hexVStepForUpright + 1e-6 && rowsUpright >= 1) {
+    if (uprightHeight > hexVStepForUpright + 1e-6 && rowsUpright >= 1) {
       // distribuir desiredN por rowsUpright linhas, centrando cada linha horizontalmente
       centersUpright = generateDistributedRowCenters(
         uprightRect,
@@ -378,7 +383,7 @@ function fillPalHex() {
     // primeira tentativa hex to get desired count for rotated
     const hexCentersRot = generateHexCentersInRect(rotRect, spacingRotW);
     const desiredNRot = hexCentersRot.length;
-    if (cylWidth > hexVStepForRot + 1e-6 && rowsRotated >= 1) {
+    if (rotatedHeight > hexVStepForRot + 1e-6 && rowsRotated >= 1) {
       centersRot = generateDistributedRowCenters(
         rotRect,
         spacingRotW,
@@ -403,8 +408,8 @@ function fillPalHex() {
       }
       return false;
     }
-    const rU = Math.max(cylWidth / 2, cylHeight / 2); // conservativo
-    const rR = Math.max(cylHeight / 2, cylWidth / 2);
+    const rU = Math.max(uprightWidth / 2, uprightHeight / 2); // conservativo
+    const rR = Math.max(rotatedWidth / 2, rotatedHeight / 2);
     // verificar intra-lista (upright-upright) e inter-lista (upright-rotated) e rotated-rotated
     let bad = false;
     for (let i = 0; i < centersUpright.length && !bad; i++) {
@@ -448,13 +453,13 @@ function fillPalHex() {
     // desenha elipses upright (centros calculados)
     centersUpright.forEach((c) => {
       ctx.beginPath();
-      cylRoundedPath(ctx, c.x, c.y, cylWidth, cylHeight);
-      ctx.fillStyle = '#F5B041';
+      cylRoundedPath(ctx, c.x, c.y, uprightWidth, uprightHeight);
+      ctx.fillStyle = rotateReels ? '#F8C471' : '#F5B041';
       ctx.fill();
       ctx.stroke();
-      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', false, cylWidth / 2, cylHeight / 2);
+      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', rotateReels, uprightWidth / 2, uprightHeight / 2);
       if (!firstMeasurementDrawn) {
-        drawBobineMeasurements(ctx, c.x, c.y, cylWidth, cylHeight, 'cylinder');
+        drawBobineMeasurements(ctx, c.x, c.y, uprightWidth, uprightHeight, 'cylinder');
         firstMeasurementDrawn = true;
       }
       count++;
@@ -462,14 +467,14 @@ function fillPalHex() {
 
     centersRot.forEach((c) => {
       ctx.beginPath();
-      cylRoundedPath(ctx, c.x, c.y, cylHeight, cylWidth);
-      ctx.fillStyle = '#F8C471';
+      cylRoundedPath(ctx, c.x, c.y, rotatedWidth, rotatedHeight);
+      ctx.fillStyle = rotateReels ? '#F5B041' : '#F8C471';
       ctx.fill();
       ctx.stroke();
-      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', true, cylHeight / 2, cylWidth / 2);
+      drawMandril(ctx, c.x, c.y, getMandrilD(), 'cylinder', !rotateReels, rotatedWidth / 2, rotatedHeight / 2);
       if (!firstMeasurementDrawn) {
         // visualmente: eixo horizontal = cylHeight, eixo vertical = cylWidth → trocar para label correcto
-        drawBobineMeasurements(ctx, c.x, c.y, cylHeight, cylWidth, 'cylinder');
+        drawBobineMeasurements(ctx, c.x, c.y, rotatedWidth, rotatedHeight, 'cylinder');
         firstMeasurementDrawn = true;
       }
       count++;

@@ -225,6 +225,7 @@ button {
 
 /* Secondary toggles */
 #exceedToggle,
+#rotateToggle,
 #linearToggle {
   background: rgba(255,255,255,0.06);
   color: #b0b8cc;
@@ -232,6 +233,7 @@ button {
 }
 
 #exceedToggle:hover,
+#rotateToggle:hover,
 #linearToggle:hover {
   background: rgba(255,255,255,0.1);
   color: #e8eaf0;
@@ -245,11 +247,18 @@ button.active {
 }
 
 #exceedToggle.active,
+#rotateToggle.active,
 #linearToggle.active {
   background: #3b82f6;
   color: #fff;
   border-color: #2563eb;
   box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+}
+
+#rotateToggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
 }
 
 /* ── Sidebar footer (download) ── */

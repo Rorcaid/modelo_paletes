@@ -68,6 +68,13 @@
             onclick="toggleLinearDisposition()">
             Adjust Disposition
           </button>
+          <button
+            id="rotateToggle"
+            type="button"
+            onclick="toggleRotateReels()"
+            disabled>
+            Rotate Reels
+          </button>
           <div id="sidebarFooter">
             <button
               type="button"
@@ -99,6 +106,7 @@
     <script>
       // estado global: true = usar linear (script.js), false = usar hex (script_hex.js)
       window.linearDisposition = true;
+      window.rotateReels = false;
 
       function toggleLinearDisposition() {
         window.linearDisposition = !window.linearDisposition;
@@ -123,6 +131,13 @@
           btn.classList.remove('active');
         }
         // redesenha com o novo estado
+        fillPalActive();
+      }
+
+      function toggleRotateReels() {
+        window.rotateReels = !window.rotateReels;
+        const btn = document.getElementById('rotateToggle');
+        btn.classList.toggle('active', window.rotateReels);
         fillPalActive();
       }
 

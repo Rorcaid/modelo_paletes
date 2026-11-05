@@ -49,6 +49,7 @@ function toggleCylinderInputs() {
     shape === 'circle' ? 'flex' : 'none';
   document.getElementById('cylinderInputs').style.display =
     shape === 'cylinder' ? 'flex' : 'none';
+  document.getElementById('rotateToggle').disabled = shape !== 'cylinder';
 }
 
 // Calcula quantas células cabem (count) e o offset para centralizar a grelha
@@ -140,9 +141,13 @@ function fillPal() {
     if (cylWidth <= 0 || cylHeight <= 0 || isNaN(cylWidth) || isNaN(cylHeight))
       return alert('Dimensões inválidas.');
 
-    // spacing para bobines upright (largura x altura)
-    const spacingW = cylWidth;
-    const spacingH = cylHeight;
+    const rotateReels = window.rotateReels === true;
+    const uprightWidth = rotateReels ? cylHeight : cylWidth;
+    const uprightHeight = rotateReels ? cylWidth : cylHeight;
+    const rotatedWidth = rotateReels ? cylWidth : cylHeight;
+    const rotatedHeight = rotateReels ? cylHeight : cylWidth;
+    const spacingW = uprightWidth;
+    const spacingH = uprightHeight;
     // colunas e offset horizontal para upright
     const { count: colsUpright, offset: offsetX } = calculateAdjustedOffset(
       canvas.width,
@@ -154,8 +159,8 @@ function fillPal() {
       calculateAdjustedOffset(canvas.height, spacingH, allowExceed);
 
     // spacing para bobines rotacionadas (troca width/height)
-    const spacingRotW = cylHeight;
-    const spacingRotH = cylWidth;
+    const spacingRotW = rotatedWidth;
+    const spacingRotH = rotatedHeight;
     // área restante abaixo das upright e quantas linhas/colunas rotacionadas cabem
     const remainingHeight = canvas.height - rowsUpright * spacingH;
     const { count: calculatedRowsRotated } = calculateAdjustedOffset(
@@ -175,14 +180,14 @@ function fillPal() {
     // caso contrário centra verticalmente as upright usando offsetYCentered
     const offsetY = rowsRotated > 0 ? 0 : offsetYCentered;
 
-    // desenha as bobines upright (elipses com rx = cylWidth/2, ry = cylHeight/2)
+    // desenha as bobines na orientação base selecionada
     for (let row = 0; row < rowsUpright; row++) {
       for (let col = 0; col < colsUpright; col++) {
         const x = offsetX + col * spacingW + spacingW / 2;
         const y = offsetY + row * spacingH + spacingH / 2;
         ctx.beginPath();
-        cylRoundedPath(ctx, x, y, cylWidth, cylHeight);
-        ctx.fillStyle = '#F5B041';
+        cylRoundedPath(ctx, x, y, uprightWidth, uprightHeight);
+        ctx.fillStyle = rotateReels ? '#F8C471' : '#F5B041';
         ctx.fill();
         ctx.stroke();
         drawMandril(
@@ -191,12 +196,12 @@ function fillPal() {
           y,
           getMandrilD(),
           'cylinder',
-          false,
-          cylWidth / 2,
-          cylHeight / 2,
+          rotateReels,
+          uprightWidth / 2,
+          uprightHeight / 2,
         );
         if (!firstMeasurementDrawn) {
-          drawBobineMeasurements(ctx, x, y, cylWidth, cylHeight, 'cylinder');
+          drawBobineMeasurements(ctx, x, y, uprightWidth, uprightHeight, 'cylinder');
           firstMeasurementDrawn = true;
         }
         count++;
@@ -208,14 +213,14 @@ function fillPal() {
       rowsUpright * spacingH +
       Math.max(0, remainingHeight - rowsRotated * spacingRotH);
 
-    // desenha as bobines rotacionadas (elipses com rx = cylHeight/2, ry = cylWidth/2)
+    // desenha as bobines na orientação alternativa
     for (let row = 0; row < rowsRotated; row++) {
       for (let col = 0; col < colsRotated; col++) {
         const x = offsetXRot + col * spacingRotW + spacingRotW / 2;
         const y = offsetYRot + row * spacingRotH + spacingRotH / 2;
         ctx.beginPath();
-        cylRoundedPath(ctx, x, y, cylHeight, cylWidth);
-        ctx.fillStyle = '#F8C471';
+        cylRoundedPath(ctx, x, y, rotatedWidth, rotatedHeight);
+        ctx.fillStyle = rotateReels ? '#F5B041' : '#F8C471';
         ctx.fill();
         ctx.stroke();
         drawMandril(
@@ -224,13 +229,13 @@ function fillPal() {
           y,
           getMandrilD(),
           'cylinder',
-          true,
-          cylHeight / 2,
-          cylWidth / 2,
+          !rotateReels,
+          rotatedWidth / 2,
+          rotatedHeight / 2,
         );
         if (!firstMeasurementDrawn) {
           // visualmente: eixo horizontal = cylHeight, eixo vertical = cylWidth → trocar para label correcto
-          drawBobineMeasurements(ctx, x, y, cylHeight, cylWidth, 'cylinder');
+          drawBobineMeasurements(ctx, x, y, rotatedWidth, rotatedHeight, 'cylinder');
           firstMeasurementDrawn = true;
         }
         count++;
